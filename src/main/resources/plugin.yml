@@ -1,0 +1,12 @@
+name: PillagersExpanded
+version: '${project.version}'
+main: me.flummox.pillagersexpanded.Main
+api-version: 1.18
+authors: [ Flummox ]
+description: Upgrades the pillager patrol system
+website: https://www.youtube.com/channel/UCZcsga5c4XiymsxsNZKsE6w
+commands:
+  spawnpatrol:
+    description: Creates a patrol at the specified location
+    usage: /<command>
+    aliases: spawnpatrol
