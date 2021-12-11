@@ -43,6 +43,15 @@ public class PillagerEventHandler implements Listener {
                 spawnedPatrols.remove(patrolEntry.getKey());
                 String currentPatrolString = "currentPatrols." + patrolEntry.getKey() + ".";
 
+                //create a list and fill with the existing traits a pillager has
+                List<String> existingTraits = data.getConfig().getStringList(currentPatrolString + "traits");
+
+                //Stop adding traits (and move on to the next patrol) if the patrol already has maximum traits
+                Integer level = data.getConfig().getInt(currentPatrolString + "level");
+                if (existingTraits.size() >= level) {
+                    break;
+                }
+
                 //Create an empty list that will be filled with possible traits a pillager can have
                 ArrayList<String> possibleTraits = new ArrayList<>();
 
@@ -81,10 +90,6 @@ public class PillagerEventHandler implements Listener {
                 possibleTraits.add("raiding"); //bad omen
                 possibleTraits.add("glowing"); //glowing
 
-                //create a list and fill with the existing traits a pillager has
-                List<String> existingTraits = new ArrayList<>();
-                existingTraits = data.getConfig().getStringList(currentPatrolString + "traits");
-
                 //remove all of the existing traits from the possible traits so that the same trait cannot be
                 //given to a pillager multiple times
                 possibleTraits.removeAll(existingTraits);
@@ -109,7 +114,9 @@ public class PillagerEventHandler implements Listener {
 
     @EventHandler
     public void onPillagerDied(EntityDeathEvent event) {
+        //Check whether the pillager is in the spawned patrol as the leader
         if (spawnedPatrols.containsValue(event.getEntity())) {
+            //Get the key (the patrol number) of the patrol that contains the leader pillager
             int patrolToRemove = -1;
             for (Map.Entry <Integer, Entity> spawnedPatrols : spawnedPatrols.entrySet()) {
                 if (event.getEntity() == spawnedPatrols.getValue()) {
@@ -117,10 +124,12 @@ public class PillagerEventHandler implements Listener {
                 }
             }
 
+            //if a patrol is found then delete them from the config
             if (patrolToRemove != -1) {
                 data.getConfig().set("currentPatrols." + patrolToRemove, null);
             }
 
+            //remove the patrol from the "Spawned" since it has been defeated
             spawnedPatrols.remove(patrolToRemove);
             data.saveConfig();
 
