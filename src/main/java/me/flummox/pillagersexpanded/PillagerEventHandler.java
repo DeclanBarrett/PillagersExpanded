@@ -79,6 +79,7 @@ public class PillagerEventHandler implements Listener {
                 possibleTraits.add("stony"); //Absorption 4
                 possibleTraits.add("farting"); //Levitation
                 possibleTraits.add("raiding"); //bad omen
+                possibleTraits.add("glowing"); //glowing
 
                 //create a list and fill with the existing traits a pillager has
                 List<String> existingTraits = new ArrayList<>();

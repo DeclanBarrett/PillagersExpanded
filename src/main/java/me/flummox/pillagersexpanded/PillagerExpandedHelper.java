@@ -287,7 +287,7 @@ public class PillagerExpandedHelper {
         //Loop through each trait to add the trait to the pillager name
         // also add any entities to the patrolIllagers dictionary so they can be spawned
         // add to the list of potion effects that will be applied to the patrol
-        ArrayList<String> potionEffects = new ArrayList<>();
+        ArrayList<PotionEffectType> potionEffects = new ArrayList<>();
 
         for (String trait: currentTraits) {
             leaderName += trait + " ";
@@ -305,7 +305,8 @@ public class PillagerExpandedHelper {
                     break;
                 case "charged": // 1 Charged Creeper
                     patrolIllagers.put(EntityType.CREEPER.toString(), 1);
-                    patrolIllagers.put(EntityType.LIGHTNING.toString(), 1);
+                    patrolIllagers.put(EntityType.ENDERMITE.toString(), 1);
+                    patrolIllagers.put(EntityType.ENDERMAN.toString(), 1);
                     break;
                 case "ghastly": // 1 Ghast
                     patrolIllagers.put(EntityType.GHAST.toString(), 1);
@@ -353,41 +354,41 @@ public class PillagerExpandedHelper {
                     patrolIllagers.put(EntityType.SPIDER.toString(), 3);
                     break;
                 case "feathery": // Slow Falling 1
-                    potionEffects.add(PotionEffectType.SLOW_FALLING.toString());
+                    potionEffects.add(PotionEffectType.SLOW_FALLING);
                     break;
                 case "regenerating": // Regeneration 1
-                    potionEffects.add(PotionEffectType.REGENERATION.toString());
+                    potionEffects.add(PotionEffectType.REGENERATION);
                     break;
                 case "jumpy": // Jump Boost 1
-                    potionEffects.add(PotionEffectType.JUMP.toString());
+                    potionEffects.add(PotionEffectType.JUMP);
                     break;
                 case "stealthy": // Invisibility
-                    potionEffects.add(PotionEffectType.INVISIBILITY.toString());
+                    potionEffects.add(PotionEffectType.INVISIBILITY);
                     break;
                 case "strong": // Strength 1
-                    potionEffects.add(PotionEffectType.INCREASE_DAMAGE.toString());
+                    potionEffects.add(PotionEffectType.INCREASE_DAMAGE);
                     break;
                 case "swift": // Speed 1
-                    potionEffects.add(PotionEffectType.SPEED.toString());
+                    potionEffects.add(PotionEffectType.SPEED);
                     break;
                 case "resistant": // Resistance 1
-                    potionEffects.add(PotionEffectType.DAMAGE_RESISTANCE.toString());
+                    potionEffects.add(PotionEffectType.DAMAGE_RESISTANCE);
                     break;
                 case "fishy": // Water Breathing 1 + 5 Tropical Fish
-                    potionEffects.add(PotionEffectType.WATER_BREATHING.toString());
+                    potionEffects.add(PotionEffectType.WATER_BREATHING);
                     patrolIllagers.put(EntityType.TROPICAL_FISH.toString(), 5);
                     break;
                 case "stony": //Absorption
-                    potionEffects.add(PotionEffectType.ABSORPTION.toString());
+                    potionEffects.add(PotionEffectType.ABSORPTION);
                     break;
                 case "farting": //Levitation
-                    potionEffects.add(PotionEffectType.LEVITATION.toString());
+                    potionEffects.add(PotionEffectType.LEVITATION);
                     break;
                 case "raiding": //bad omen
-                    potionEffects.add(PotionEffectType.BAD_OMEN.toString());
+                    potionEffects.add(PotionEffectType.BAD_OMEN);
                     break;
                 case "glowing": //bad omen
-                    potionEffects.add(PotionEffectType.GLOWING.toString());
+                    potionEffects.add(PotionEffectType.GLOWING);
                     break;
             }
         }
@@ -411,27 +412,25 @@ public class PillagerExpandedHelper {
 
         pillager.setRemoveWhenFarAway(true); //$
 
-        //
+        //Get the patrol leader to use his location
         if (pillager.isPatrolLeader())  {
             System.out.println("Instantiating a pillager patrol");
             Location location = pillager.getLocation();
 
-            //
+            //For every entry in the local patrol illagers spawning hashmap
             for (Map.Entry <String, Integer> entry : patrolIllagers.entrySet()) {
-                String key = entry.getKey();
-                Integer value = entry.getValue();
+                String entityKey = entry.getKey();
+                Integer entityValue = entry.getValue();
                 Integer level = data.getConfig().getInt("currentPatrols." + patrolIndex + "." + "level");
-                for (Integer illagerIndex = 0; illagerIndex < (value * (level * 0.75)); illagerIndex++) {
-                    LivingEntity entity = (LivingEntity) pillager.getWorld().spawnEntity(location, EntityType.valueOf(key));
+                for (Integer illagerIndex = 0; illagerIndex < (entityValue * (level * 0.75)); illagerIndex++) { //$ need to have a config that modifies the effect of levels
 
-                    if (strong) {
-                        entity.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 60000, 1));
+                    //Spawn the entity
+                    LivingEntity entity = (LivingEntity) pillager.getWorld().spawnEntity(location, EntityType.valueOf(entityKey));
+
+                    //Apply potion effects to everyone
+                    for (PotionEffectType potionEffect : potionEffects) {
+                        entity.addPotionEffect(new PotionEffect(potionEffect, 60000, 1));
                     }
-
-                    if (swift) {
-                        entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 60000, 2));
-                    }
-
                 }
             }
         }
