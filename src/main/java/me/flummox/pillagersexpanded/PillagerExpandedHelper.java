@@ -93,39 +93,74 @@ public class PillagerExpandedHelper {
 
     */
 
+
+    //Updates the location of a patrol
     public void updatePatrolLocation(int patrolNumber, int timeInterval) {
 
+        //Gets the current location and puts it in a point
         System.out.println("Updating Patrol Locations");
         int currentX = data.getConfig().getInt("currentPatrols." + patrolNumber + "." + "currentX");
         int currentZ = data.getConfig().getInt("currentPatrols." + patrolNumber + "." + "currentZ");
         Point currentP = new Point(currentX, currentZ);
 
+        //Gets the current destination
         int destinationX = data.getConfig().getInt("currentPatrols." + patrolNumber + "." + "destinationX");
         int destinationZ = data.getConfig().getInt("currentPatrols." + patrolNumber + "." + "destinationZ");
         Point destinationP = new Point(destinationX, destinationZ);
 
+        //Gets the current progress towards the destination
         double currentProgress = data.getConfig().getDouble("currentPatrols." + patrolNumber + "." + "currentProgress");
+        //Gets the speed that was calculated at the start of the journey (how far to move each increment)
         double speed = data.getConfig().getDouble("currentPatrols." + patrolNumber + "." + "speed");
 
-        data.getConfig().set("currentPatrols." + patrolNumber + "." + "currentProgress", currentProgress + speed);
+        //New progress (1200 is one minute (20 ticks a second * 60 seconds)
+        double newProgress = currentProgress + speed * (timeInterval/1200);
+        //Set the current progress to the new progress
+        data.getConfig().set("currentPatrols." + patrolNumber + "." + "currentProgress", newProgress);
+
+        //Move alone the line by percentage (progress is based 0-1)
         currentP = currentP.moveTo(currentProgress + speed, destinationP);
 
+        //If the distance to 0 is less than 3 chunks then get a new location
         if (currentP.dist(destinationP) < 3) {
-            data.getConfig().set("currentPatrols." + patrolNumber + "." + "currentX", Math.floor(currentP.x));
+            System.out.println("Finding New Location");
+            //Sets the current patrol location to exactly the destination
+            //data.getConfig().set("currentPatrols." + patrolNumber + "." + "currentX", Math.floor(currentP.x));
+
+            //add to the level since it has reached a new destination
             int level = data.getConfig().getInt("currentPatrols." + patrolNumber + "." + "level");
             level += 1;
             data.getConfig().set("currentPatrols." + patrolNumber + "." + "level", level);
-            Location pillagerOutpost = pillagerOutpost();
-            destinationP = new Point((int) pillagerOutpost.getX(), (int) pillagerOutpost.getZ());
 
+            //Locate a pillager outpost to assign to the destination
+            Location destinationOutpost = null;
+
+            //Send the patrol to a village every second visit
+            if (level % 2 == 0) {
+                destinationOutpost = villagerOutpost(currentX * 16, currentZ * 16);
+            } else {
+                destinationOutpost = pillagerOutpost();
+            }
+
+            //Create a destination point with integers
+            destinationP = new Point((int) destinationOutpost.getX(), (int) destinationOutpost.getZ());
+
+            //The distance between the current point and the destination found
             double distance = currentP.dist(destinationP);
 
+            //The distance is in chunks (thus multiplying it by 2 means that it will move 2 chunks a minute)
             speed = 2/distance;
 
+            //Make sure speed is not greater than 1 since if greater than 1 it will go over the destination immediately
+            if (speed > 1) {
+                speed = 1;
+            }
+
+            //Set the current progress to 0 again and the new speed
             data.getConfig().set("currentPatrols." + patrolNumber + "." + "currentProgress", 0);
             data.getConfig().set("currentPatrols." + patrolNumber + "." + "speed", speed);
 
-
+            //Set the destination as the location and
             data.getConfig().set("currentPatrols." + patrolNumber + "." + "destinationX", Math.floor(destinationP.x/16));
             data.getConfig().set("currentPatrols." + patrolNumber + "." + "destinationZ", Math.floor(destinationP.y/16));
             System.out.println("Acquired New Target");
@@ -144,10 +179,6 @@ public class PillagerExpandedHelper {
     public void createPatrol(int x, int z) {
         System.out.println("Create Patrol");
         Location patrolSpawnLocation = new Location(server.getWorld("world"), x, 0, z);
-        int size = 0;
-        if (data.getConfig().getConfigurationSection("currentPatrols") != null) {
-            size = data.getConfig().getConfigurationSection("currentPatrols").getKeys(false).size();
-        }
 
         Integer patrolNumber = Collections.max(data.getConfig().getConfigurationSection("currentPatrols").getKeys(false).stream()
                 .map(s -> Integer.parseInt(s))
@@ -220,22 +251,56 @@ public class PillagerExpandedHelper {
         data.saveConfig();
     }
 
+    /**
+     * Find a pillager outpost within the configured range
+     * @return the location fo the pillager outpost
+     */
     public Location pillagerOutpost() {
         System.out.println("Finding a pillager outpost");
         //Get the current amount of patrols
-        Integer xLocation = (int) (Math.random() * 40000 - 20000);
+        Integer xLocation = (int) (Math.random() * 40000 - 20000); //$
         Integer yLocation = (int) (Math.random() * 40000 - 20000);
-        Location patrolSpawnLocation = server.getWorld("world").locateNearestStructure(
-                new Location(server.getWorld("world"), xLocation, 144, yLocation),
-                StructureType.PILLAGER_OUTPOST,
-                5000, true);
-        try {
-            System.out.println(patrolSpawnLocation);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        Location patrolSpawnLocation = null;
+
+        //looks for an outpost till it is guaranteed to have one
+        do {
+            patrolSpawnLocation = server.getWorld("world").locateNearestStructure(
+                    new Location(server.getWorld("world"), xLocation, 144, yLocation),
+                    StructureType.PILLAGER_OUTPOST,
+                    5000, false); //$
+        } while (patrolSpawnLocation == null);
+
+        System.out.println(patrolSpawnLocation);
+
         return patrolSpawnLocation;
     }
+
+    /**
+     * Find a pillager outpost within the configured range
+     * @return the location fo the pillager outpost
+     */
+    public Location villagerOutpost(Integer currentX, Integer currentZ) {
+        System.out.println("Finding a pillager outpost");
+        //Get the current amount of patrolscurrentX
+        Integer xLocation = (int) (Math.random() * 5000 - (2500 + currentX)); //$
+        Integer yLocation = (int) (Math.random() * 5000 - (2500 + currentZ));
+
+        Location patrolSpawnLocation = null;
+
+        //looks for an outpost till it is guaranteed to have one
+        do {
+            patrolSpawnLocation = server.getWorld("world").locateNearestStructure(
+                    new Location(server.getWorld("world"), xLocation, 144, yLocation),
+                    StructureType.VILLAGE,
+                    1000, false); //$
+        } while (patrolSpawnLocation == null);
+
+        System.out.println(patrolSpawnLocation);
+
+        return patrolSpawnLocation;
+    }
+
 
     /**
      * Attempts to spawn a patrol given the patrol number and the location to spawn it

@@ -18,8 +18,8 @@ public class PillagerEventHandler implements Listener {
 
     private DataManager data;
     private PillagerExpandedHelper pillagerExpandedHelper;
-    private final int patrolSpawnTimer = 10;
-    private int currentTimer = 9;
+    private final int patrolSpawnTimer = 30;
+    private int currentTimer = 29;
 
     public PillagerEventHandler(HashMap<String, Integer> patrolIllagers, DataManager data, Server server) {
         this.data = data;
@@ -139,7 +139,7 @@ public class PillagerEventHandler implements Listener {
     //Updates when patrol is updated
     @EventHandler
     public void onPatrolUpdate(PatrolUpdateEvent event) {
-        System.out.println("On Patrol Triggered");
+        //System.out.println("On Patrol Triggered");
         //After a certain amount of time - create a patrol at a pillager outpost
         currentTimer++;
         if (currentTimer % patrolSpawnTimer == 0) {
@@ -150,7 +150,7 @@ public class PillagerEventHandler implements Listener {
         }
         // No current patrols to update
         if (data.getConfig().getConfigurationSection("currentPatrols") == null) {
-            System.out.println("No Patrols");
+            //System.out.println("No Patrols");
             return;
         }
 
@@ -159,7 +159,7 @@ public class PillagerEventHandler implements Listener {
 
         //Loops through all the patrols
         for (String key: currentPatrols) {
-            System.out.println("Patrol: " + currentPatrols);
+            //System.out.println("Patrol: " + currentPatrols);
             //If the patrol is not already spawned then update its location and attempt to spawn it
             if (!spawnedPatrols.containsKey(Integer.parseInt(key))) {
                 //Update each patrols location if not spawned
@@ -181,7 +181,7 @@ public class PillagerEventHandler implements Listener {
 
                 //}
             } else {
-                System.out.println("The Patrol: " + Integer.parseInt(key) + " is still spawned");
+                //System.out.println("The Patrol: " + Integer.parseInt(key) + " is still spawned");
             }
         }
 
