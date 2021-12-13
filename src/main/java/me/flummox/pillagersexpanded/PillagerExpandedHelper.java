@@ -39,62 +39,11 @@ public class PillagerExpandedHelper {
         this.patrolIllagers = patrolIllagers;
     }
 
-
-    /*
-      Create patrols based on timing from  (configuration needed)
-          Create  patrols based on presence (configuration off)
-
-     Change location of patrols based on timing
-
-     Spawn patrols based on presence (within the despawn distance)
-
-     Patrol survives if Patrol leader survives
-        Patrol leader gets a custom name
-        Patrol leader gets a random trait
-            Leader (patrol gains extra level)
-            Strong (all spawned get Strength effect)
-            Swift (rate of travel increases between destinations)
-            Scorched (adds blazes to patrol)
-            Undead (adds zombies to patrol)
-
-        Patrol gain a level
-
-        Example: Grognac the Leader Captain. Reuben the Strong Swift Stealthy Captain
-
-     Spawning interrupts moving to a village - chooses new village once despawned
-
-     Patrols move between villagers within the wander area
-
-     Patrols gain a level for each village reached
-          The villagers pay tribute rather than being destroyed
-          Lore being that a raid is reparations for dead Illagers
-
-    Integration with SaberFactions - Patrols only spawn outside faction areas
-
-    Pillager outposts spawn Pillager patrols
-    If no pillager outposts exist in the wandering range then a pillager camp spawns at a random location
-
-
-
-
-     Custom commands
-
-     /pillagercamps
-     /currentpatrols
-
-
-
-     if pillager captain is caught in a chunk unload
-        remove and add the patrol back to the moving
-        set pillager captains to be persistent so that they can get caught in a chunk unload
-
-
-
-
-    */
-
-
-    //Updates the location of a patrol
+    /**
+     * Updates the location of a patrol
+     * @param patrolNumber the patrol to update
+     * @param timeInterval the time interval between updates
+     */
     public void updatePatrolLocation(int patrolNumber, int timeInterval) {
 
         //Gets the current location and puts it in a point
@@ -149,7 +98,7 @@ public class PillagerExpandedHelper {
             double distance = currentP.dist(destinationP);
 
             //The distance is in chunks (thus multiplying it by 2 means that it will move 2 chunks a minute)
-            speed = 2/distance;
+            speed = 0.5/distance;
 
             //Make sure speed is not greater than 1 since if greater than 1 it will go over the destination immediately
             if (speed > 1) {
@@ -175,14 +124,22 @@ public class PillagerExpandedHelper {
 
     }
 
-    //Create a patrol at a pillager outpost
+    /**
+     * Create a patrol at a pillager outpost
+     * @param x in blocks not chunks
+     * @param z in blocks not chunks
+     */
     public void createPatrol(int x, int z) {
         System.out.println("Create Patrol");
         Location patrolSpawnLocation = new Location(server.getWorld("world"), x, 0, z);
 
-        Integer patrolNumber = Collections.max(data.getConfig().getConfigurationSection("currentPatrols").getKeys(false).stream()
-                .map(s -> Integer.parseInt(s))
-                .collect(Collectors.toSet()));
+        Integer patrolNumber = 0;
+        if (data.getConfig().getConfigurationSection("currentPatrols") != null) {
+            patrolNumber = Collections.max(data.getConfig().getConfigurationSection("currentPatrols").getKeys(false).stream()
+                    .map(s -> Integer.parseInt(s))
+                    .collect(Collectors.toSet()));
+        }
+
 
         String[] names = {
                 "Jack", "Henry", "Grognack", "Bron's Son", "Pril",
@@ -207,7 +164,6 @@ public class PillagerExpandedHelper {
         };
 
         //Random name that isnt used elsewhere
-
         List<String> localNames = Arrays.asList(names.clone());
 
         if (data.getConfig().getConfigurationSection("currentPatrols") != null) {
@@ -242,7 +198,7 @@ public class PillagerExpandedHelper {
         Point destinationP = new Point(0, 0);
         double distance = currentP.dist(destinationP);
 
-        double speed = 2/distance;
+        double speed = 0.5/distance;
 
         data.getConfig().set(currentPatrolString + "currentProgress", 0);
         data.getConfig().set(currentPatrolString + "level", 1);

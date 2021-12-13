@@ -41,12 +41,12 @@ public final class Main extends JavaPlugin {
         this.data = new DataManager(this);
         if (!this.data.getConfig().contains("patrols.patrolRadius")) {
             data.getConfig().set("patrols.pillager", 3);
-            data.getConfig().set("patrols.vindicator", 5);
+            data.getConfig().set("patrols.vindicator", 3);
             data.getConfig().set("patrols.evoker", 0);
-            data.getConfig().set("patrols.illusioner", 1);
+            data.getConfig().set("patrols.illusioner", 0);
             data.getConfig().set("patrols.ravager", 0);
             data.getConfig().set("patrols.witch", 1);
-            data.getConfig().set("patrols.vex", 1);
+            data.getConfig().set("patrols.vex", 0);
 
             data.getConfig().set("patrols.wander", true);
             data.getConfig().set("patrols.patrolsPersist", true);
