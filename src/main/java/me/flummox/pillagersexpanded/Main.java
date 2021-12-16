@@ -21,10 +21,11 @@ public final class Main extends JavaPlugin {
         int id = getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
-                PatrolUpdateEvent patrolUpdate = new PatrolUpdateEvent(2400);
+                PatrolUpdateEvent patrolUpdate = new PatrolUpdateEvent(1200);
+                System.out.println("Patrol Running");
                 getPluginManager().callEvent(patrolUpdate);
             }
-        }, 1200, 2400);
+        }, 120, 1200);
 
         PatrolCommands patrolCommands = new PatrolCommands();
         getCommand("spawnpatrol").setExecutor(patrolCommands);
@@ -38,7 +39,8 @@ public final class Main extends JavaPlugin {
 
     private void setupPatrols() {
         HashMap<String, Integer> patrolIllagers = new HashMap<>();
-        this.data = new DataManager(this);
+        this.data = DataManager.getInstance();
+        this.data.setupData(this);
         if (!this.data.getConfig().contains("patrols.patrolRadius")) {
             data.getConfig().set("patrols.pillager", 3);
             data.getConfig().set("patrols.vindicator", 3);
@@ -63,7 +65,8 @@ public final class Main extends JavaPlugin {
         patrolIllagers.put("WITCH", this.data.getConfig().getInt("patrols.witch"));
         patrolIllagers.put("VEX", this.data.getConfig().getInt("patrols.vex"));
 
-        getServer().getPluginManager().registerEvents(new PillagerEventHandler(patrolIllagers, data, getServer()), this);
+        getServer().getPluginManager().registerEvents(PillagerEventHandler.getInstance(), this);
+        PillagerEventHandler.getInstance().setup( data, getServer());
     }
 
 }

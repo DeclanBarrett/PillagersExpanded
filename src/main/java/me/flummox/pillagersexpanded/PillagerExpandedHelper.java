@@ -12,6 +12,8 @@ import javax.swing.plaf.synth.SynthUI;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.bukkit.Bukkit.getServer;
+
 /**
  * Creates patrols that are persistent and wander around the map
  */
@@ -39,11 +41,62 @@ public class PillagerExpandedHelper {
         this.patrolIllagers = patrolIllagers;
     }
 
-    /**
-     * Updates the location of a patrol
-     * @param patrolNumber the patrol to update
-     * @param timeInterval the time interval between updates
-     */
+
+    /*
+      Create patrols based on timing from  (configuration needed)
+          Create  patrols based on presence (configuration off)
+
+     Change location of patrols based on timing
+
+     Spawn patrols based on presence (within the despawn distance)
+
+     Patrol survives if Patrol leader survives
+        Patrol leader gets a custom name
+        Patrol leader gets a random trait
+            Leader (patrol gains extra level)
+            Strong (all spawned get Strength effect)
+            Swift (rate of travel increases between destinations)
+            Scorched (adds blazes to patrol)
+            Undead (adds zombies to patrol)
+
+        Patrol gain a level
+
+        Example: Grognac the Leader Captain. Reuben the Strong Swift Stealthy Captain
+
+     Spawning interrupts moving to a village - chooses new village once despawned
+
+     Patrols move between villagers within the wander area
+
+     Patrols gain a level for each village reached
+          The villagers pay tribute rather than being destroyed
+          Lore being that a raid is reparations for dead Illagers
+
+    Integration with SaberFactions - Patrols only spawn outside faction areas
+
+    Pillager outposts spawn Pillager patrols
+    If no pillager outposts exist in the wandering range then a pillager camp spawns at a random location
+
+
+
+
+     Custom commands
+
+     /pillagercamps
+     /currentpatrols
+
+
+
+     if pillager captain is caught in a chunk unload
+        remove and add the patrol back to the moving
+        set pillager captains to be persistent so that they can get caught in a chunk unload
+
+
+
+
+    */
+
+
+    //Updates the location of a patrol
     public void updatePatrolLocation(int patrolNumber, int timeInterval) {
 
         //Gets the current location and puts it in a point
@@ -98,7 +151,7 @@ public class PillagerExpandedHelper {
             double distance = currentP.dist(destinationP);
 
             //The distance is in chunks (thus multiplying it by 2 means that it will move 2 chunks a minute)
-            speed = 0.5/distance;
+            speed = 2/distance;
 
             //Make sure speed is not greater than 1 since if greater than 1 it will go over the destination immediately
             if (speed > 1) {
@@ -124,17 +177,13 @@ public class PillagerExpandedHelper {
 
     }
 
-    /**
-     * Create a patrol at a pillager outpost
-     * @param x in blocks not chunks
-     * @param z in blocks not chunks
-     */
+    //Create a patrol at a pillager outpost
     public void createPatrol(int x, int z) {
         System.out.println("Create Patrol");
         Location patrolSpawnLocation = new Location(server.getWorld("world"), x, 0, z);
 
         Integer patrolNumber = 0;
-        if (data.getConfig().getConfigurationSection("currentPatrols") != null) {
+        if (data.getConfig().getConfigurationSection("currentPatrols").getKeys(false) != null) {
             patrolNumber = Collections.max(data.getConfig().getConfigurationSection("currentPatrols").getKeys(false).stream()
                     .map(s -> Integer.parseInt(s))
                     .collect(Collectors.toSet()));
@@ -164,6 +213,7 @@ public class PillagerExpandedHelper {
         };
 
         //Random name that isnt used elsewhere
+
         List<String> localNames = Arrays.asList(names.clone());
 
         if (data.getConfig().getConfigurationSection("currentPatrols") != null) {
@@ -198,7 +248,7 @@ public class PillagerExpandedHelper {
         Point destinationP = new Point(0, 0);
         double distance = currentP.dist(destinationP);
 
-        double speed = 0.5/distance;
+        double speed = 2/distance;
 
         data.getConfig().set(currentPatrolString + "currentProgress", 0);
         data.getConfig().set(currentPatrolString + "level", 1);
@@ -209,7 +259,7 @@ public class PillagerExpandedHelper {
 
     /**
      * Find a pillager outpost within the configured range
-     * @return the location fo the pillager outpost
+     * @return the location fo the pillager outpost (with block location)
      */
     public Location pillagerOutpost() {
         System.out.println("Finding a pillager outpost");
@@ -221,8 +271,8 @@ public class PillagerExpandedHelper {
 
         //looks for an outpost till it is guaranteed to have one
         do {
-            patrolSpawnLocation = server.getWorld("world").locateNearestStructure(
-                    new Location(server.getWorld("world"), xLocation, 144, yLocation),
+            patrolSpawnLocation = getServer().getWorld("world").locateNearestStructure(
+                    new Location(getServer().getWorld("world"), xLocation, 144, yLocation),
                     StructureType.PILLAGER_OUTPOST,
                     5000, false); //$
         } while (patrolSpawnLocation == null);
@@ -234,7 +284,7 @@ public class PillagerExpandedHelper {
 
     /**
      * Find a pillager outpost within the configured range
-     * @return the location fo the pillager outpost
+     * @return the location fo the pillager outpost (in block form)
      */
     public Location villagerOutpost(Integer currentX, Integer currentZ) {
         System.out.println("Finding a pillager outpost");
@@ -246,8 +296,8 @@ public class PillagerExpandedHelper {
 
         //looks for an outpost till it is guaranteed to have one
         do {
-            patrolSpawnLocation = server.getWorld("world").locateNearestStructure(
-                    new Location(server.getWorld("world"), xLocation, 144, yLocation),
+            patrolSpawnLocation = getServer().getWorld("world").locateNearestStructure(
+                    new Location(getServer().getWorld("world"), xLocation, 144, yLocation),
                     StructureType.VILLAGE,
                     1000, false); //$
         } while (patrolSpawnLocation == null);
@@ -492,51 +542,6 @@ public class PillagerExpandedHelper {
         }
     }
 
-    class Point {
-        public final double x;
-        public final double y;
 
-        public Point(double x, double y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        /**
-         * Here you are. This is what you want to implement.
-         * from.moveTo(0.0, to) => from
-         * from.moveTo(1.0, to) => to
-         *
-         * @param by - from 0.0 to 1.0 (from 0% to 100%)
-         * @param target - move toward target by delta
-         */
-        public Point moveTo(double by, Point target) {
-            Point delta = target.subtract(this);
-            return add(delta.dot(by));
-        }
-
-        public Point add(Point point) {
-            return new Point(x + point.x, y + point.y);
-        }
-
-        public Point subtract(Point point) {
-            return new Point(x - point.x, y - point.y);
-        }
-
-        public Point dot(double v) {
-            return new Point(v * x, v * y);
-        }
-
-        public double dist(Point point) {
-            return subtract(point).length();
-        }
-
-        public double length() {
-            return Math.sqrt(x * x + y * y);
-        }
-
-        public String toString() {
-            return x + ":" + y;
-        }
-    }
 
 }

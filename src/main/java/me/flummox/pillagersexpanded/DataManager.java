@@ -1,5 +1,6 @@
 package me.flummox.pillagersexpanded;
 
+import org.bukkit.Server;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -14,10 +15,22 @@ public class DataManager {
     private FileConfiguration dataConfig = null;
     private File configFile = null;
 
-    public DataManager(Main plugin) {
+    public void setupData(Main plugin) {
         this.plugin = plugin;
         //save/initializes the config
         saveDefaultConfig();
+    }
+
+    protected DataManager() {
+
+    }
+
+    private static class SingletonHolder {
+        private final static DataManager INSTANCE = new DataManager();
+    }
+
+    public static DataManager getInstance() {
+        return DataManager.SingletonHolder.INSTANCE;
     }
 
     public void reloadConfig() {

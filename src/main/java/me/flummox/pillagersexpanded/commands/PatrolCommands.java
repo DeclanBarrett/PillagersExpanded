@@ -1,5 +1,7 @@
 package me.flummox.pillagersexpanded.commands;
 
+import me.flummox.pillagersexpanded.PatrolUpdateEvent;
+import me.flummox.pillagersexpanded.PillagerEventHandler;
 import me.flummox.pillagersexpanded.PillagerExpandedHelper;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -7,6 +9,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import static org.bukkit.Bukkit.getPluginManager;
 
 public class PatrolCommands implements CommandExecutor {
     @Override
@@ -21,9 +25,11 @@ public class PatrolCommands implements CommandExecutor {
         } else {
             if (command.getName().equalsIgnoreCase("spawnpatrol")) {
                 if (args.length >= 2) {
-                    PillagerExpandedHelper.getInstance().createPatrol(
+                    PillagerEventHandler.getInstance().createPatrol(
                             Integer.parseInt(args[0]),
                             Integer.parseInt(args[1]));
+                    PatrolUpdateEvent patrolUpdate = new PatrolUpdateEvent(1);
+                    getPluginManager().callEvent(patrolUpdate);
                     System.out.println("Spawn Patrol Executed");
                 } else {
                     System.out.println("/spawnpatrol x z");
