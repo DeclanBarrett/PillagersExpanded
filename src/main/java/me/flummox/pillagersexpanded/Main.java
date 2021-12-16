@@ -35,6 +35,7 @@ public final class Main extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        PillagerEventHandler.getInstance().cleanUp();
     }
 
     private void setupPatrols() {

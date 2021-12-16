@@ -6,6 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
+import javax.xml.crypto.Data;
 import java.util.*;
 
 public class PillagerEventHandler implements Listener {
@@ -30,8 +31,16 @@ public class PillagerEventHandler implements Listener {
             Set<String> keyName = data.getConfig().getConfigurationSection("currentPatrols").getKeys(false);
 
             for (String s : keyName) {
-                patrols.add(new Patrol(data, Integer.parseInt(s)));
+                Patrol patrol = new Patrol(data, Integer.parseInt(s));
+                patrols.add(patrol);
+                patrol.reloadOnSave();
             }
+        }
+    }
+
+    public void cleanUp() {
+        for (Patrol patrol : patrols) {
+            patrol.cleanOnDisable();
         }
     }
 
@@ -54,7 +63,7 @@ public class PillagerEventHandler implements Listener {
         //Check whether the pillager is in the spawned patrol as the leader
         for (Patrol patrol: patrols) {
             if (patrol.isSpawned() && patrol.getPatrolLeader() == event.getEntity()) {
-                patrol.setPatrolLeader(null);
+                patrol.despawn();
                 patrols.remove(patrol);
                 patrol.remove();
                 break;

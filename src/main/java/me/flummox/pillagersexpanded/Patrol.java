@@ -87,18 +87,9 @@ public class Patrol {
         save();
     }
 
-    private void patrolIllagersSetup() {
-        System.out.println(patrolIndex + " - Setting up Patrol");
-        patrolIllagers.put("PILLAGER", this.data.getConfig().getInt("patrols.pillager"));
-        patrolIllagers.put("VINDICATOR", this.data.getConfig().getInt("patrols.vindicator"));
-        patrolIllagers.put("EVOKER", this.data.getConfig().getInt("patrols.evoker"));
-        patrolIllagers.put("ILLUSIONER", this.data.getConfig().getInt("patrols.illusioner"));
-        patrolIllagers.put("RAVAGER", this.data.getConfig().getInt("patrols.ravager"));
-        patrolIllagers.put("WITCH", this.data.getConfig().getInt("patrols.witch"));
-        patrolIllagers.put("VEX", this.data.getConfig().getInt("patrols.vex"));
-    }
-
-    //Create a patrol at a pillager outpost
+    /**
+     * Creates a starter patrol at the specified x and z coordinates
+     */
     public Patrol(int x, int z) {
         data = DataManager.getInstance();
         System.out.println("Create Patrol");
@@ -168,9 +159,27 @@ public class Patrol {
         save();
     }
 
+    /**
+     * Retrueves the illager quantities from the configuration file
+     */
+    private void patrolIllagersSetup() {
+        System.out.println(patrolIndex + " - Setting up Patrol");
+        patrolIllagers.put("PILLAGER", this.data.getConfig().getInt("patrols.pillager"));
+        patrolIllagers.put("VINDICATOR", this.data.getConfig().getInt("patrols.vindicator"));
+        patrolIllagers.put("EVOKER", this.data.getConfig().getInt("patrols.evoker"));
+        patrolIllagers.put("ILLUSIONER", this.data.getConfig().getInt("patrols.illusioner"));
+        patrolIllagers.put("RAVAGER", this.data.getConfig().getInt("patrols.ravager"));
+        patrolIllagers.put("WITCH", this.data.getConfig().getInt("patrols.witch"));
+        patrolIllagers.put("VEX", this.data.getConfig().getInt("patrols.vex"));
+    }
+
+    /**
+     * Spawns a patrol physically in the the world
+     * @return
+     */
     public boolean spawnPatrol() {
         //Check whether the chunk it is attempting to spawn in is loaded
-        if (spawned) {
+        if (patrolLeader != null) {
             return false;
         }
 
@@ -205,7 +214,6 @@ public class Patrol {
 
         //Begin to spawn the pillagers
         patrolLeader = (Pillager) world.spawnEntity(spawnLocation, EntityType.PILLAGER);
-        spawned = true;
 
         //Create the name
         String leaderName = this.leaderName;
@@ -370,10 +378,11 @@ public class Patrol {
 
     public void move(int timeInterval) {
         //Gets the current location and puts it in a point
-        if (spawned || patrolLeader != null) {
+        if (patrolLeader != null) {
             System.out.println(patrolIndex + " - Spawned - CANT MOVE");
             return;
         }
+
         System.out.println(patrolIndex + " - Updating Patrol Locations");
         Point currentP = new Point(currentX, currentZ);
 
@@ -406,9 +415,7 @@ public class Patrol {
 
     public boolean isSpawned() {
         if (patrolLeader != null) {
-            spawned = true;
-            System.out.println(patrolIndex + " - set spawned: " + spawned);
-            save();
+            System.out.println(patrolIndex + " - is spawned");
             return true;
         }
         return false;
@@ -417,10 +424,8 @@ public class Patrol {
     public boolean isDespawned() {
         if (patrolLeader != null) {
             if (patrolLeader.isDead()) {
-                setPatrolLeader(null);
-                spawned = false;
+                despawn();
                 System.out.println(patrolIndex + " - set spawned: " + spawned);
-                save();
                 return true;
             }
         }
@@ -428,15 +433,13 @@ public class Patrol {
     }
 
     public void setPatrolLeader(Pillager pillager) {
-        if (pillager == null) {
-            spawned = false;
-            System.out.println(patrolIndex + " - set spawned: " + spawned);
-        } else {
-            spawned = true;
-            System.out.println(patrolIndex + " - set spawned: " + spawned);
-        }
-        save();
         patrolLeader = pillager;
+        save();
+    }
+
+    public void despawn() {
+        setPatrolLeader(null);
+        spawned = false;
     }
 
     public void upgradePatrol() {
@@ -514,7 +517,6 @@ public class Patrol {
         data.getConfig().set(currentPatrolString + "currentSpeed", this.currentSpeed);
         data.getConfig().set(currentPatrolString + "traits", this.traits);
         data.getConfig().set(currentPatrolString + "spawned", this.spawned);
-        data.getConfig().set(currentPatrolString + "leader", this.patrolLeader.getUniqueId().toString());
         data.saveConfig();
     }
 
@@ -531,16 +533,6 @@ public class Patrol {
         this.currentSpeed = data.getConfig().getDouble(currentPatrolString + "currentSpeed");
         this.spawned = data.getConfig().getBoolean(currentPatrolString + "spawned");
         this.traits = data.getConfig().getStringList(currentPatrolString + "traits");
-        String leaderID = data.getConfig().getString(currentPatrolString + "leader");
-        if (leaderID != null) {
-            for (World w: getServer().getWorlds()) {
-                for (Entity e : w.getEntities()) {
-                    if (leaderID == e.getUniqueId().toString()) {
-                        patrolLeader = (Pillager) e;
-                    }
-                }
-            }
-        }
     }
 
     private Point newDestination() {
@@ -580,5 +572,51 @@ public class Patrol {
         System.out.println(patrolIndex + " DESTROYED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         String currentPatrolString = "currentPatrols." + (this.patrolIndex);
         data.getConfig().set(currentPatrolString, null);
+    }
+
+    public void cleanOnDisable() {
+        if (patrolLeader != null) {
+            patrolLeader.remove();
+            spawned = true;
+            patrolLeader = null;
+            save();
+        }
+    }
+
+    public void reloadOnSave() {
+        if (spawned == true) {
+            World world = getServer().getWorld("world");
+            spawnLeader(world, new Location(world, currentX, world.getHighestBlockYAt(currentX, currentZ) ,currentZ));
+            spawned = false;
+        }
+    }
+
+    private void spawnLeader(World world, Location spawnLocation) {
+
+        //Begin to spawn the pillagers
+        patrolLeader = (Pillager) world.spawnEntity(spawnLocation, EntityType.PILLAGER);
+
+        //Create the name
+        String leaderName = this.leaderName;
+        leaderName += " the ";
+
+        // Handle gathering the traits that the pillager leader has
+        //######################################################
+        List<String> currentTraits = traits;
+
+        //Loop through each trait to add the trait to the pillager name
+        // also add any entities to the patrolIllagers dictionary so they can be spawned
+        // add to the list of potion effects that will be applied to the patrol
+        for (String trait : currentTraits) {
+            leaderName += trait + " ";
+        }
+
+        leaderName += "captain";
+        patrolLeader.setCustomName(leaderName);
+
+        //Set the leader settings
+        patrolLeader.setPatrolLeader(true);
+        patrolLeader.getEquipment().setItemInMainHand(null);
+        patrolLeader.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 60000, 1));
     }
 }
