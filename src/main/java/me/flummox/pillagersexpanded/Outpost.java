@@ -1,8 +1,12 @@
 package me.flummox.pillagersexpanded;
 
+import me.flummox.pillagersexpanded.eventHandlers.buildOutpostRunnable;
+import me.flummox.pillagersexpanded.eventHandlers.moveRunnable;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.EntityType;
 
 import java.util.Optional;
 
@@ -27,47 +31,24 @@ public class Outpost {
      */
     public Outpost(int outpostID, Location outpostLocation) {
         World world = outpostLocation.getWorld();
-        int offset = 7;
-        Material bottomLeft = world.getBlockAt(outpostLocation.getBlockX() - offset,
-                world.getHighestBlockYAt(outpostLocation.getBlockX() - offset, outpostLocation.getBlockZ() - offset),
-                outpostLocation.getBlockZ() - offset).getType();
+        Material locationMaterial = world.getBlockAt(outpostLocation.getBlockX() ,
+                world.getHighestBlockYAt(outpostLocation.getBlockX() , outpostLocation.getBlockZ() ),
+                outpostLocation.getBlockZ() ).getType();
 
-        Material bottomRight = world.getBlockAt(outpostLocation.getBlockX() - offset,
-                world.getHighestBlockYAt(outpostLocation.getBlockX() - offset, outpostLocation.getBlockZ() - offset),
-                outpostLocation.getBlockZ() + offset).getType();
-
-        Material topLeft = world.getBlockAt(outpostLocation.getBlockX() + offset,
-                world.getHighestBlockYAt(outpostLocation.getBlockX() - offset, outpostLocation.getBlockZ() - offset),
-                outpostLocation.getBlockZ() - offset).getType();
-
-        Material topRight = world.getBlockAt(outpostLocation.getBlockX() + offset,
-                world.getHighestBlockYAt(outpostLocation.getBlockX() - offset, outpostLocation.getBlockZ() - offset),
-                outpostLocation.getBlockZ() + offset).getType();
-
-        System.out.println("bottom left " + bottomLeft + ", bottom right " + bottomRight + ", top left " + topLeft + " top right " + topRight);
-        if (bottomLeft == Material.DARK_OAK_LOG || bottomLeft == Material.OBSIDIAN || bottomLeft == Material.DARK_OAK_PLANKS || bottomLeft == Material.BIRCH_PLANKS) {
-            outpostLocation.setX(outpostLocation.getBlockX() - offset);
-            outpostLocation.setZ(outpostLocation.getBlockZ() - offset);
-            outpostLocation.setY(world.getHighestBlockYAt(outpostLocation.getBlockX()- offset, outpostLocation.getBlockZ() - offset));
-        } else if (bottomRight == Material.DARK_OAK_LOG || bottomRight == Material.OBSIDIAN || bottomRight == Material.DARK_OAK_PLANKS || bottomRight == Material.BIRCH_PLANKS) {
-            outpostLocation.setX(outpostLocation.getBlockX() - offset);
-            outpostLocation.setZ(outpostLocation.getBlockZ() + offset);
-            outpostLocation.setY(world.getHighestBlockYAt(outpostLocation.getBlockX() - offset, outpostLocation.getBlockZ() - offset));
-        } else if (topLeft == Material.DARK_OAK_LOG || topLeft == Material.OBSIDIAN || topLeft == Material.DARK_OAK_PLANKS || topLeft == Material.BIRCH_PLANKS) {
-            outpostLocation.setX(outpostLocation.getBlockX() + offset);
-            outpostLocation.setZ(outpostLocation.getBlockZ() - offset);
-            outpostLocation.setY(world.getHighestBlockYAt(outpostLocation.getBlockX() - offset, outpostLocation.getBlockZ() - offset));
-        } else if (topRight == Material.DARK_OAK_LOG || topRight == Material.OBSIDIAN || topRight == Material.DARK_OAK_PLANKS || topRight == Material.BIRCH_PLANKS) {
-            outpostLocation.setX(outpostLocation.getBlockX() + offset);
-            outpostLocation.setZ(outpostLocation.getBlockZ() + offset);
-            outpostLocation.setY(world.getHighestBlockYAt(outpostLocation.getBlockX() - offset, outpostLocation.getBlockZ() - offset));
+        System.out.println("Outpost material" + locationMaterial );
+        outpostLocation.setX(outpostLocation.getBlockX() );
+        outpostLocation.setZ(outpostLocation.getBlockZ() );
+        outpostLocation.setY(world.getHighestBlockYAt(outpostLocation.getBlockX(), outpostLocation.getBlockZ() ));
+        if (locationMaterial != Material.SPAWNER) {
+            outpostLocation.getBlock().setType(Material.SPAWNER);
+            ((CreatureSpawner) outpostLocation.getBlock()).setSpawnedType(EntityType.VINDICATOR);
         } else {
-            System.out.println("ERROR SOMETHING IS WRONG " + bottomLeft + bottomRight + topLeft + topRight);
+            System.out.println(" " + locationMaterial);
         }
-        world = null;
         this.outpostLocation = outpostLocation;
         this.level = 1;
         this.outpostID = outpostID;
+        new buildOutpostRunnable(outpostLocation, Main.getPlugin(Main.class)).runTaskAsynchronously(Main.getPlugin(Main.class));
         generateWall();
         System.out.println("CREATED " + outpostID + "| x: " + outpostLocation.getX() + " y: " + outpostLocation.getY() + " z: " + outpostLocation.getZ());
         save();
@@ -97,7 +78,7 @@ public class Outpost {
 
     private void generateWall() {
         //if (hasWall) {
-            outpostLocation.getBlock().setType(Material.BIRCH_PLANKS);
+            //outpostLocation.getBlock().setType(Material.BIRCH_PLANKS);
            // hasWall = true;
         //}
     }
