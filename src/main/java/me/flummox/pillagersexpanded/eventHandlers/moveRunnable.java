@@ -1,5 +1,7 @@
-package me.flummox.pillagersexpanded;
+package me.flummox.pillagersexpanded.eventHandlers;
 
+import me.flummox.pillagersexpanded.Main;
+import me.flummox.pillagersexpanded.Patrol;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;

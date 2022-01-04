@@ -1,4 +1,4 @@
-package me.flummox.pillagersexpanded;
+package me.flummox.pillagersexpanded.eventHandlers;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;

@@ -1,19 +1,20 @@
-package me.flummox.pillagersexpanded;
+package me.flummox.pillagersexpanded.eventHandlers;
 
+import me.flummox.pillagersexpanded.*;
+import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
-import javax.xml.crypto.Data;
 import java.util.*;
 
-public class PillagerEventHandler implements Listener {
+import static org.bukkit.Bukkit.getServer;
 
-    private static Server server;
-    private static DataManager data;
+public class PillagerEventHandler implements Listener {
     private ArrayList<Patrol> patrols = new ArrayList<>();
+    private ArrayList<Outpost> outposts = new ArrayList<>();
 
     protected PillagerEventHandler() {
 
@@ -24,8 +25,6 @@ public class PillagerEventHandler implements Listener {
     }
 
     public void setup(DataManager data, Server server) {
-        this.data = data;
-        this.server = server;
         //need to fill the patrols array with the patrols that already exist in data form
         if (data.getConfig().getConfigurationSection("currentPatrols") != null) {
             Set<String> keyName = data.getConfig().getConfigurationSection("currentPatrols").getKeys(false);
@@ -35,6 +34,27 @@ public class PillagerEventHandler implements Listener {
                 patrols.add(patrol);
                 patrol.reloadOnSave();
             }
+        }
+
+        setupOutposts(data);
+
+    }
+
+    private void setupOutposts(DataManager data) {
+        if (data.getConfig().getConfigurationSection("outposts") != null) {
+            System.out.println("Attempting to store outposts to memory!");
+            Set<String> keyName = data.getConfig().getConfigurationSection("outposts").getKeys(false);
+
+            for (String s : keyName) {
+                Outpost outpost = new Outpost(Integer.parseInt(s));
+                outposts.add(outpost);
+            }
+        } else {
+            ArrayList<Location> outpostLocations = PillagerExpandedHelper.getInstance().pillagerOutposts();
+            for (int x = 0; x < outpostLocations.size(); x++) {
+                new Outpost(x, outpostLocations.get(x));
+            }
+            setupOutposts(data);
         }
     }
 

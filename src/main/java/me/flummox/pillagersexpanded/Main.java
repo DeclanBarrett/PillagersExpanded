@@ -1,6 +1,8 @@
 package me.flummox.pillagersexpanded;
 
 import me.flummox.pillagersexpanded.commands.PatrolCommands;
+import me.flummox.pillagersexpanded.eventHandlers.PatrolUpdateEvent;
+import me.flummox.pillagersexpanded.eventHandlers.PillagerEventHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;

@@ -180,6 +180,7 @@ public class Patrol {
     public boolean spawnPatrol() {
         //Check whether the chunk it is attempting to spawn in is loaded
         if (patrolLeader != null) {
+            System.out.println("Cannot spawn ITS ALREADY SPAWNED");
             return false;
         }
 
@@ -548,7 +549,7 @@ public class Patrol {
 
         //Create a destination point with integers
         destinationX = (int) (destinationOutpost.getX()/16);
-        destinationZ = (int) (destinationOutpost.getY()/16);
+        destinationZ = (int) (destinationOutpost.getZ()/16);
 
         Point destinationP = new Point(destinationX, destinationZ);
         Point currentP = new Point(currentX, currentZ);
@@ -572,9 +573,11 @@ public class Patrol {
         System.out.println(patrolIndex + " DESTROYED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         String currentPatrolString = "currentPatrols." + (this.patrolIndex);
         data.getConfig().set(currentPatrolString, null);
+        data.saveConfig();
     }
 
     public void cleanOnDisable() {
+        System.out.println("CLEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN");
         if (patrolLeader != null) {
             patrolLeader.remove();
             spawned = true;
@@ -584,6 +587,7 @@ public class Patrol {
     }
 
     public void reloadOnSave() {
+        System.out.println("IM RELOADING!!!!!!!!!!!!!!!!!!!!!!!!!!!!! NEED AMMO NOW ");
         if (spawned == true) {
             World world = getServer().getWorld("world");
             spawnLeader(world, new Location(world, currentX, world.getHighestBlockYAt(currentX, currentZ) ,currentZ));
@@ -592,6 +596,33 @@ public class Patrol {
     }
 
     private void spawnLeader(World world, Location spawnLocation) {
+
+        if (world.isChunkLoaded(currentX, currentZ)) {
+
+            //If loaded then check if there are players within a radius
+            boolean spawnCausePlayerInRange = false;
+            for (Player players : Bukkit.getOnlinePlayers()) {
+                spawnLocation = new Location(world, currentX * 16, world.getHighestBlockYAt(currentX * 16, currentZ * 16) + 2, currentZ * 16);
+                Location playerLocation = new Location(world, players.getLocation().getBlockX(), players.getLocation().getBlockY(), players.getLocation().getBlockZ());
+                //Point playerPoint = new Point(players.getLocation().getBlockX(), players.getLocation().getBlockZ());
+                //Point spawnLocation = new Point(currentX, currentZ);
+                double location = playerLocation.distance(spawnLocation);
+                if (location < 70) {
+                    spawnCausePlayerInRange = true;
+                }
+            }
+
+            //Will stop if the player not in range
+            if (!spawnCausePlayerInRange) {
+                System.out.println(patrolIndex + " LEADER Refused to spawn as no players nearby");
+                return;
+            }
+        } else {
+            System.out.println(patrolIndex + " LEADER Refused to spawn as the chunk is not loaded");
+            return;
+        }
+
+        System.out.println("COMMAND LEADER HAS BEEN SPAWNED!!!");
 
         //Begin to spawn the pillagers
         patrolLeader = (Pillager) world.spawnEntity(spawnLocation, EntityType.PILLAGER);

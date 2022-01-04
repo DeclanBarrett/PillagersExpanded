@@ -1,9 +1,7 @@
 package me.flummox.pillagersexpanded.commands;
 
-import me.flummox.pillagersexpanded.PatrolUpdateEvent;
-import me.flummox.pillagersexpanded.PillagerEventHandler;
-import me.flummox.pillagersexpanded.PillagerExpandedHelper;
-import org.bukkit.Location;
+import me.flummox.pillagersexpanded.eventHandlers.PatrolUpdateEvent;
+import me.flummox.pillagersexpanded.eventHandlers.PillagerEventHandler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
