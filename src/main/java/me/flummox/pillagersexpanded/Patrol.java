@@ -1,5 +1,8 @@
 package me.flummox.pillagersexpanded;
 
+import me.flummox.pillagersexpanded.eventHandlers.PatrolUpdateEvent;
+import me.flummox.pillagersexpanded.eventHandlers.PillagerEventHandler;
+import me.flummox.pillagersexpanded.eventHandlers.UpgradeEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -10,8 +13,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.bukkit.Bukkit.getServer;
-import static org.bukkit.Bukkit.getWorld;
+import static org.bukkit.Bukkit.*;
 
 public class Patrol {
 
@@ -31,6 +33,8 @@ public class Patrol {
 
     private int destinationX;
     private int destinationZ;
+
+    private Outpost destinationOutpost;
 
     private int level;
     private int patrolIndex;
@@ -92,7 +96,7 @@ public class Patrol {
      */
     public Patrol(int x, int z) {
         data = DataManager.getInstance();
-        System.out.println("Create Patrol");
+        System.out.println("Creating Patrol");
         World world = getServer().getWorld("world");
         level = 1;
         spawned = false;
@@ -384,7 +388,6 @@ public class Patrol {
             return;
         }
 
-        System.out.println(patrolIndex + " - Updating Patrol Locations");
         Point currentP = new Point(currentX, currentZ);
 
         //Gets the current destination
@@ -411,7 +414,28 @@ public class Patrol {
             System.out.println("Acquired New Target To Travel To");
         }
 
+        System.out.println(patrolIndex + " Moved to - x: " + destinationX + ", z: " + destinationZ);
+
         save();
+    }
+
+    public void attemptArrive() {
+        Point currentP = new Point(currentX, currentZ);
+        Point destinationP = new Point(destinationX, destinationZ);
+        //If the distance to 0 is less than 3 chunks then get a new location
+        if (currentP.dist(destinationP) < 3) {
+            System.out.println("Finding New Location");
+            //Sets the current patrol location to exactly the destination
+
+            this.level += 1;
+
+            if (destinationOutpost != null) {
+                getPluginManager().callEvent(new UpgradeEvent(destinationOutpost));
+            }
+            newDestination();
+
+            System.out.println("Acquired New Target To Travel To");
+        }
     }
 
     public boolean isSpawned() {
@@ -518,6 +542,11 @@ public class Patrol {
         data.getConfig().set(currentPatrolString + "currentSpeed", this.currentSpeed);
         data.getConfig().set(currentPatrolString + "traits", this.traits);
         data.getConfig().set(currentPatrolString + "spawned", this.spawned);
+        int outpostID = -1;
+        if (destinationOutpost != null) {
+            outpostID = destinationOutpost.getOutpostID();
+        }
+        data.getConfig().set(currentPatrolString + "destinationOutpostID", outpostID);
         data.saveConfig();
     }
 
@@ -534,22 +563,25 @@ public class Patrol {
         this.currentSpeed = data.getConfig().getDouble(currentPatrolString + "currentSpeed");
         this.spawned = data.getConfig().getBoolean(currentPatrolString + "spawned");
         this.traits = data.getConfig().getStringList(currentPatrolString + "traits");
+        this.destinationOutpost = PillagerEventHandler.getInstance().getSpecificOutpost(data.getConfig().getInt(currentPatrolString + "destinationOutpostID"));
     }
 
     private Point newDestination() {
         //Locate a pillager outpost to assign to the destination
-        Location destinationOutpost = null;
+        Location destinationOutpostLocation;
 
         //Send the patrol to a village every second visit
         if (level % 2 == 0) {
-            destinationOutpost = PillagerExpandedHelper.getInstance().villagerOutpost(currentX * 16, currentZ * 16);
+            destinationOutpostLocation = PillagerExpandedHelper.getInstance().villagerOutpost(currentX * 16, currentZ * 16);
+            destinationOutpost = null;
         } else {
-            destinationOutpost = PillagerExpandedHelper.getInstance().pillagerOutpost();
+            destinationOutpost = PillagerEventHandler.getInstance().getRandomOutpost();
+            destinationOutpostLocation = destinationOutpost.getOutpostLocation();
         }
 
         //Create a destination point with integers
-        destinationX = (int) (destinationOutpost.getX()/16);
-        destinationZ = (int) (destinationOutpost.getZ()/16);
+        destinationX = (int) (destinationOutpostLocation.getX()/16);
+        destinationZ = (int) (destinationOutpostLocation.getZ()/16);
 
         Point destinationP = new Point(destinationX, destinationZ);
         Point currentP = new Point(currentX, currentZ);

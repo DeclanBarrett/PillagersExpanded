@@ -24,7 +24,6 @@ public final class Main extends JavaPlugin {
             @Override
             public void run() {
                 PatrolUpdateEvent patrolUpdate = new PatrolUpdateEvent(1200);
-                System.out.println("Patrol Running");
                 getPluginManager().callEvent(patrolUpdate);
             }
         }, 120, 1200);
@@ -55,6 +54,7 @@ public final class Main extends JavaPlugin {
 
             data.getConfig().set("patrols.wander", true);
             data.getConfig().set("patrols.patrolsPersist", true);
+            data.getConfig().set("patrols.total", 25);
             data.getConfig().set("patrols.patrolRadius", 1000);
 
             data.saveConfig();

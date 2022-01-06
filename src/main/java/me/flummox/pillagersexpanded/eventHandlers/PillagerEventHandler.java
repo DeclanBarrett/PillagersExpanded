@@ -14,6 +14,29 @@ import static org.bukkit.Bukkit.getServer;
 
 public class PillagerEventHandler implements Listener {
     private ArrayList<Patrol> patrols = new ArrayList<>();
+
+    public ArrayList<Patrol> getPatrols() {
+        return patrols;
+    }
+
+    public ArrayList<Outpost> getOutposts() {
+        return outposts;
+    }
+
+    public Outpost getRandomOutpost() {
+        int randomInt = (int) (Math.random() * outposts.size());
+        return outposts.get(randomInt);
+    }
+
+    public Outpost getSpecificOutpost(int index) {
+        for (Outpost outpost: outposts) {
+            if (outpost.getOutpostID() == index) {
+                return outpost;
+            }
+        }
+        return null;
+    }
+
     private ArrayList<Outpost> outposts = new ArrayList<>();
 
     protected PillagerEventHandler() {
@@ -95,11 +118,17 @@ public class PillagerEventHandler implements Listener {
     @EventHandler
     public void onPatrolUpdate(PatrolUpdateEvent event) {
 
-        new moveRunnable(patrols, event.getInterval(), Main.getPlugin(Main.class)).runTaskAsynchronously(Main.getPlugin(Main.class));
+        new moveRunnable(event.getInterval(), Main.getPlugin(Main.class)).runTaskAsynchronously(Main.getPlugin(Main.class));
 
+    }
+
+    @EventHandler
+    public void onUpgrade(UpgradeEvent event) {
+        event.getOutpost().upgradeOutpost();
     }
 
     public void createPatrol(int x, int z) {
         patrols.add(new Patrol(x, z));
     }
+
 }
