@@ -55,7 +55,7 @@ public class PillagerEventHandler implements Listener {
             for (String s : keyName) {
                 Patrol patrol = new Patrol(data, Integer.parseInt(s));
                 patrols.add(patrol);
-                System.out.println("[Pillagers Expanded] Adding a patrol to the cache of patrols");
+               //"[Pillagers Expanded] Adding a patrol to the cache of patrols");
                 patrol.reloadOnSave();
             }
         }
@@ -66,7 +66,7 @@ public class PillagerEventHandler implements Listener {
 
     private void setupOutposts(DataManager data) {
         if (data.getConfig().getConfigurationSection("outposts") != null) {
-            System.out.println("Attempting to store outposts to memory!");
+           //"Attempting to store outposts to memory!");
             Set<String> keyName = data.getConfig().getConfigurationSection("outposts").getKeys(false);
 
             for (String s : keyName) {

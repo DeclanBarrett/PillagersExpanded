@@ -125,7 +125,7 @@ public class Outpost {
         this.isActive = DataManager.getInstance().getConfig().getBoolean(outpostString + "isActive");
         this.outpostLocation = new Location(getServer().getWorld("world"), currentX, currentY, currentZ);
         rebuildOutpost();
-        System.out.println("LOADED " + outpostID + "| x: " + outpostLocation.getX() + " y: " + outpostLocation.getY() + " z: " + outpostLocation.getZ());
+       //"LOADED " + outpostID + "| x: " + outpostLocation.getX() + " y: " + outpostLocation.getY() + " z: " + outpostLocation.getZ());
     }
 
     private void rebuildOutpost() {
@@ -135,7 +135,7 @@ public class Outpost {
                 world.getHighestBlockYAt(outpostLocation.getBlockX() , outpostLocation.getBlockZ() ),
                 outpostLocation.getBlockZ() ).getType();
 
-        System.out.println("Outpost material" + locationMaterial );
+       //"Outpost material" + locationMaterial );
 
         if (isActive == true) {
             int offset = 3;
@@ -143,7 +143,7 @@ public class Outpost {
                 for (int x = 0; x < building[y].length; x++) {
                     for (int z = 0; z < building[y][x].length; z++) {
                         //Spawn the specified block at the location
-                        System.out.println("y: " + y + " x: " + x + " z: " + z);
+                       //"y: " + y + " x: " + x + " z: " + z);
                         if (building[y][x][z] != null) {
                             world.getBlockAt(new Location( world,outpostLocation.getX() - offset + x,outpostLocation.getY() + y, outpostLocation.getZ() - offset + z)).setType(building[y][x][z]);
                         }
@@ -159,17 +159,17 @@ public class Outpost {
             CreatureSpawner creatureSpawner = (CreatureSpawner) block.getState();
             creatureSpawner.setSpawnedType(EntityType.VINDICATOR);
         } else {
-            System.out.println(" Material at Spawner " + locationMaterial);
+           //" Material at Spawner " + locationMaterial);
         }
 
-        System.out.println("CREATED " + outpostID + "| x: " + outpostLocation.getX() + " y: " + outpostLocation.getY() + " z: " + outpostLocation.getZ());
+       //"CREATED " + outpostID + "| x: " + outpostLocation.getX() + " y: " + outpostLocation.getY() + " z: " + outpostLocation.getZ());
         save();
     }
 
 
 
     public void upgradeOutpost() {
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!Outpost Upgrading!!!!!!!!!!!!!!!!!!!!!!!!");
+       System.out.println("!!!!!!!!!!!!!!!!!!!!!!Outpost Upgrading!!!!!!!!!!!!!!!!!!!!!!!!");
         World world = outpostLocation.getWorld();
         level++;
         if (level == 2) {
@@ -211,7 +211,7 @@ public class Outpost {
     }
 
     private void generateWall() {
-        System.out.println("Generating Wall");
+       //"Generating Wall");
         World world = outpostLocation.getWorld();
         int squareOffset = 40;
         int yOffset = 30;
@@ -279,7 +279,7 @@ public class Outpost {
     }
 
     public void save() {
-        System.out.println(outpostID + " is saving");
+       //outpostID + " is saving");
         String currentPatrolString = "outposts." + (this.outpostID) + ".";
         DataManager.getInstance().getConfig().set(currentPatrolString + "x", this.outpostLocation.getBlockX());
         DataManager.getInstance().getConfig().set(currentPatrolString + "y", this.outpostLocation.getBlockY());
@@ -311,7 +311,7 @@ public class Outpost {
 
     public void attemptProducePatrol() {
         int chance = (int) (Math.random() * 20);
-        System.out.println("Attempting to Produce Patrol");
+       //"Attempting to Produce Patrol");
         if (chance < level) {
             PillagerEventHandler.getInstance().createPatrol(
                     outpostLocation.getBlockX(),
@@ -320,7 +320,7 @@ public class Outpost {
     }
 
     public void remove() {
-        System.out.println(outpostID + " DESTROYED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+       //outpostID + " DESTROYED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         String currentOutpostString = "outposts." + (this.getOutpostID());
         DataManager data = DataManager.getInstance();
         data.getConfig().set(currentOutpostString, null);

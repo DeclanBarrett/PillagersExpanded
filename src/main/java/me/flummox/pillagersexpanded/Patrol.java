@@ -39,9 +39,10 @@ public class Patrol {
     private int level;
     private int patrolIndex;
 
-    private double speedMultiplier;
-    private double currentSpeed;
-    private double currentProgress;
+    //private double speedMultiplier;
+    //private double currentSpeed;
+    //private double currentProgress;
+    private int speed;
 
     private String leaderName;
 
@@ -68,12 +69,10 @@ public class Patrol {
      * @param destinationX destination x chunk location
      * @param destinationZ destination z chunk location
      * @param level power level of the patrol
-     * @param speedMultiplier determines how quickly the patrol moves
-     * @param currentSpeed the
      * @param leaderName
      * @param traits
      */
-    public Patrol(DataManager data, int patrolIndex, int currentX, int currentZ, int destinationX, int destinationZ, int level, double speedMultiplier, double currentSpeed, double currentProgress, String leaderName, ArrayList<String> traits, boolean spawned) {
+    public Patrol(DataManager data, int patrolIndex, int currentX, int currentZ, int destinationX, int destinationZ, int level, int speed, String leaderName, ArrayList<String> traits, boolean spawned) {
         this.data = DataManager.getInstance();
         this.patrolIndex = patrolIndex;
         this.currentX = currentX;
@@ -81,9 +80,10 @@ public class Patrol {
         this.destinationX = destinationX;
         this.destinationZ = destinationZ;
         this.level = level;
-        this.speedMultiplier = speedMultiplier;
-        this.currentSpeed = currentSpeed;
-        this.currentProgress = currentProgress;
+        //this.speedMultiplier = speedMultiplier;
+        //this.currentSpeed = currentSpeed;
+        //this.currentProgress = currentProgress;
+        this.speed = speed;
         this.leaderName = leaderName;
         this.traits = traits;
         this.spawned = spawned;
@@ -96,7 +96,7 @@ public class Patrol {
      */
     public Patrol(int x, int z) {
         data = DataManager.getInstance();
-        System.out.println("Creating Patrol");
+       //"Creating Patrol");
         World world = getServer().getWorld("world");
         level = 1;
         spawned = false;
@@ -152,7 +152,7 @@ public class Patrol {
 
         currentX = (int) Math.floor(patrolSpawnLocation.getX()/16);
         currentZ = (int) Math.floor(patrolSpawnLocation.getZ()/16);
-        speedMultiplier = 1; //$
+        speed = 1; //$
 
         leaderName = localNames.get(rnd);
 
@@ -167,7 +167,7 @@ public class Patrol {
      * Retrueves the illager quantities from the configuration file
      */
     private void patrolIllagersSetup() {
-        System.out.println(patrolIndex + " - Setting up Patrol");
+       //patrolIndex + " - Setting up Patrol");
         patrolIllagers.put("PILLAGER", this.data.getConfig().getInt("patrols.pillager"));
         patrolIllagers.put("VINDICATOR", this.data.getConfig().getInt("patrols.vindicator"));
         patrolIllagers.put("EVOKER", this.data.getConfig().getInt("patrols.evoker"));
@@ -184,14 +184,14 @@ public class Patrol {
     public boolean spawnPatrol() {
         //Check whether the chunk it is attempting to spawn in is loaded
         if (patrolLeader != null) {
-            System.out.println("Cannot spawn ITS ALREADY SPAWNED");
+           //"Cannot spawn ITS ALREADY SPAWNED");
             return false;
         }
 
         World world = getServer().getWorld("world");
         Location spawnLocation = null;
 
-        System.out.println(patrolIndex + " Chunk is loaded " + world.isChunkLoaded(currentX, currentZ));
+       //patrolIndex + " Chunk is loaded " + world.isChunkLoaded(currentX, currentZ));
         if (world.isChunkLoaded(currentX, currentZ)) {
 
             //If loaded then check if there are players within a radius
@@ -209,11 +209,11 @@ public class Patrol {
 
             //Will stop if the player not in range
             if (!spawnCausePlayerInRange) {
-                System.out.println(patrolIndex + " Refused to spawn as no players nearby");
+               //patrolIndex + " Refused to spawn as no players nearby");
                 return false;
             }
         } else {
-            System.out.println(patrolIndex + " Refused to spawn as the chunk is not loaded");
+           //patrolIndex + " Refused to spawn as the chunk is not loaded");
             return false;
         }
 
@@ -353,14 +353,14 @@ public class Patrol {
         patrolLeader.setRemoveWhenFarAway(true); //$
 
         //Get the patrol leader to use his location
-        System.out.println("Is patrol leader? " + patrolLeader.isPatrolLeader());
+       //"Is patrol leader? " + patrolLeader.isPatrolLeader());
         if (patrolLeader.isPatrolLeader()) {
-            System.out.println("Instantiating a pillager patrol");
+           //"Instantiating a pillager patrol");
             Location location = patrolLeader.getLocation();
 
             //For every entry in the local patrol illagers spawning hashmap
             for (Map.Entry<String, Integer> entry : patrolIllagersTemp.entrySet()) {
-                System.out.println("Spawning Illagers of Type: " + entry.getKey());
+               //"Spawning Illagers of Type: " + entry.getKey());
                 String entityKey = entry.getKey();
                 Integer entityValue = entry.getValue();
                 for (Integer illagerIndex = 0; illagerIndex < (entityValue * (level * 0.75)); illagerIndex++) { //$ need to have a config that modifies the effect of levels
@@ -384,10 +384,11 @@ public class Patrol {
     public void move(int timeInterval) {
         //Gets the current location and puts it in a point
         if (patrolLeader != null) {
-            System.out.println(patrolIndex + " - Spawned - CANT MOVE");
+           //patrolIndex + " - Spawned - CANT MOVE");
             return;
         }
 
+        /*
         Point currentP = new Point(currentX, currentZ);
 
         //Gets the current destination
@@ -398,23 +399,37 @@ public class Patrol {
         //Set the current progress to the new progress
 
         //Move alone the line by percentage (progress is based 0-1)
+        System.out.print(patrolIndex + " Current x: " + currentP.x + ", z: " + currentP.y + " ~ ");
         currentP = currentP.moveTo(currentProgress, destinationP);
+        System.out.print(" Next x: " + currentP.x + ", z: " + currentP.y);
+        System.out.println(" Dest x: " + destinationX + ", z: " + destinationZ);
         currentX = (int) currentP.x;
         currentZ = (int) currentP.y;
 
+         */
+        if (currentX < destinationX) {
+            currentX += speed;
+        } else if (currentX > destinationX) {
+            currentX -= speed;
+        }
+
+        if (currentZ < destinationZ) {
+            currentZ += speed;
+        } else if (currentZ > destinationZ) {
+            currentZ -= speed;
+        }
+
         //If the distance to 0 is less than 3 chunks then get a new location
-        if (currentP.dist(destinationP) < 3) {
-            System.out.println("Finding New Location");
+        if (currentX == destinationX && currentZ == destinationZ) {
+           //"Finding New Location");
             //Sets the current patrol location to exactly the destination
 
             this.level += 1;
 
             newDestination();
 
-            System.out.println("Acquired New Target To Travel To");
+           //"Acquired New Target To Travel To");
         }
-
-        System.out.println(patrolIndex + " Moved to - x: " + destinationX + ", z: " + destinationZ);
 
         save();
     }
@@ -434,13 +449,13 @@ public class Patrol {
             }
             newDestination();
 
-            System.out.println("Acquired New Target To Travel To");
+           //"Acquired New Target To Travel To");
         }
     }
 
     public boolean isSpawned() {
         if (patrolLeader != null) {
-            System.out.println(patrolIndex + " - is spawned");
+           //patrolIndex + " - is spawned");
             return true;
         }
         return false;
@@ -450,7 +465,7 @@ public class Patrol {
         if (patrolLeader != null) {
             if (patrolLeader.isDead()) {
                 despawn();
-                System.out.println(patrolIndex + " - set spawned: " + spawned);
+               //patrolIndex + " - set spawned: " + spawned);
                 return true;
             }
         }
@@ -468,7 +483,7 @@ public class Patrol {
     }
 
     public void upgradePatrol() {
-        System.out.println("[Pillagers Expanded] Upgrade Patrol");
+       //"[Pillagers Expanded] Upgrade Patrol");
         //Stop adding traits (and move on to the next patrol) if the patrol already has maximum traits
         if (traits.size() >= level) {
             return;
@@ -531,7 +546,7 @@ public class Patrol {
     }
 
     public void save() {
-        System.out.println(patrolIndex + " is saving");
+       //patrolIndex + " is saving");
         String currentPatrolString = "currentPatrols." + (this.patrolIndex) + ".";
         data.getConfig().set(currentPatrolString + "currentX", this.currentX);
         data.getConfig().set(currentPatrolString + "currentZ", this.currentZ);
@@ -539,8 +554,8 @@ public class Patrol {
         data.getConfig().set(currentPatrolString + "destinationZ", this.destinationZ);
         data.getConfig().set(currentPatrolString + "leaderName", this.leaderName);
         data.getConfig().set(currentPatrolString + "level", this.level);
-        data.getConfig().set(currentPatrolString + "speed", this.speedMultiplier);
-        data.getConfig().set(currentPatrolString + "currentSpeed", this.currentSpeed);
+        data.getConfig().set(currentPatrolString + "speed", this.speed);
+        //data.getConfig().set(currentPatrolString + "currentSpeed", this.currentSpeed);
         data.getConfig().set(currentPatrolString + "traits", this.traits);
         data.getConfig().set(currentPatrolString + "spawned", this.spawned);
         int outpostID = -1;
@@ -552,7 +567,7 @@ public class Patrol {
     }
 
     public void load() {
-        System.out.println(patrolIndex + " is loading");
+       //patrolIndex + " is loading");
         String currentPatrolString = "currentPatrols." + (this.patrolIndex) + ".";
         this.currentX = data.getConfig().getInt(currentPatrolString + "currentX");
         this.currentZ = data.getConfig().getInt(currentPatrolString + "currentZ");
@@ -560,23 +575,25 @@ public class Patrol {
         this.destinationZ = data.getConfig().getInt(currentPatrolString + "destinationZ");
         this.leaderName = data.getConfig().getString(currentPatrolString + "leaderName");
         this.level = data.getConfig().getInt(currentPatrolString + "level");
-        this.speedMultiplier = data.getConfig().getDouble(currentPatrolString + "speed");
-        this.currentSpeed = data.getConfig().getDouble(currentPatrolString + "currentSpeed");
+        this.speed = data.getConfig().getInt(currentPatrolString + "speed");
+        //this.currentSpeed = data.getConfig().getDouble(currentPatrolString + "currentSpeed");
         this.spawned = data.getConfig().getBoolean(currentPatrolString + "spawned");
         this.traits = data.getConfig().getStringList(currentPatrolString + "traits");
         this.destinationOutpost = PillagerEventHandler.getInstance().getSpecificOutpost(data.getConfig().getInt(currentPatrolString + "destinationOutpostID"));
     }
 
-    private Point newDestination() {
+    private void newDestination() {
         //Locate a pillager outpost to assign to the destination
         Location destinationOutpostLocation;
 
         //Send the patrol to a village every second visit
         if (level % 2 == 0) {
             destinationOutpostLocation = PillagerExpandedHelper.getInstance().villagerOutpost(currentX * 16, currentZ * 16);
+            System.out.println("[Pillagers Expanded] Going to a village");
             destinationOutpost = null;
         } else {
             destinationOutpost = PillagerEventHandler.getInstance().getRandomOutpost();
+            System.out.println("[Pillagers Expanded] Going to an outpost");
             destinationOutpostLocation = destinationOutpost.getOutpostLocation();
         }
 
@@ -584,6 +601,7 @@ public class Patrol {
         destinationX = (int) (destinationOutpostLocation.getX()/16);
         destinationZ = (int) (destinationOutpostLocation.getZ()/16);
 
+        /*
         Point destinationP = new Point(destinationX, destinationZ);
         Point currentP = new Point(currentX, currentZ);
 
@@ -597,20 +615,20 @@ public class Patrol {
         if (currentSpeed > 1) {
             currentSpeed = 1;
         }
-
-        System.out.println(patrolIndex + " is getting new destination");
-        return destinationP;
+         */
+       //patrolIndex + " is getting new destination");
+        //return destinationP;
     }
 
     public void remove() {
-        System.out.println(patrolIndex + " DESTROYED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+       //patrolIndex + " DESTROYED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         String currentPatrolString = "currentPatrols." + (this.patrolIndex);
         data.getConfig().set(currentPatrolString, null);
         data.saveConfig();
     }
 
     public void cleanOnDisable() {
-        System.out.println("CLEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN");
+       //"CLEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAN");
         if (patrolLeader != null) {
             patrolLeader.remove();
             spawned = true;
@@ -620,7 +638,7 @@ public class Patrol {
     }
 
     public void reloadOnSave() {
-        System.out.println("IM RELOADING!!!!!!!!!!!!!!!!!!!!!!!!!!!!! NEED AMMO NOW ");
+       //"IM RELOADING!!!!!!!!!!!!!!!!!!!!!!!!!!!!! NEED AMMO NOW ");
         if (spawned == true) {
             World world = getServer().getWorld("world");
             spawnLeader(world, new Location(world, currentX, world.getHighestBlockYAt(currentX, currentZ) ,currentZ));
@@ -647,15 +665,15 @@ public class Patrol {
 
             //Will stop if the player not in range
             if (!spawnCausePlayerInRange) {
-                System.out.println(patrolIndex + " LEADER Refused to spawn as no players nearby");
+               //patrolIndex + " LEADER Refused to spawn as no players nearby");
                 return;
             }
         } else {
-            System.out.println(patrolIndex + " LEADER Refused to spawn as the chunk is not loaded");
+           //patrolIndex + " LEADER Refused to spawn as the chunk is not loaded");
             return;
         }
 
-        System.out.println("COMMAND LEADER HAS BEEN SPAWNED!!!");
+       //"COMMAND LEADER HAS BEEN SPAWNED!!!");
 
         //Begin to spawn the pillagers
         patrolLeader = (Pillager) world.spawnEntity(spawnLocation, EntityType.PILLAGER);

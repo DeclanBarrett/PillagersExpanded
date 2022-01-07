@@ -22,11 +22,11 @@ public class moveRunnable extends BukkitRunnable {
     @Override
     public void run() {
 
-        System.out.println("Running the produce outpost patrol runnable");
+       System.out.println("[Pillagers Expanded] Run");
 
         ArrayList<Outpost> outposts = PillagerEventHandler.getInstance().getOutposts();
 
-        System.out.println("There are less patrols than the patrols total");
+       //"There are less patrols than the patrols total");
         for (Outpost outpost: outposts) {
             //If the patrol is not already spawned then update its location and attempt to spawn it
             outpost.checkRaided();
@@ -42,16 +42,16 @@ public class moveRunnable extends BukkitRunnable {
         //Loops through all the patrols
         ArrayList<Patrol> patrols = PillagerEventHandler.getInstance().getPatrols();
 
-        System.out.println("[Pillagers Expanded] patrols attempting to move");
+       //"[Pillagers Expanded] patrols attempting to move");
         for (Patrol patrol: patrols) {
-            System.out.println("[Pillagers Expanded] Moving a Patrol");
+           //System.out.println("[Pillagers Expanded] Moving a Patrol");
             //If the patrol is not already spawned then update its location and attempt to spawn it
             if (!patrol.isSpawned()) {
                 //Update each patrols location if not spawned
                 //patrol.move(event.getInterval());
                 patrol.move(interval);
             } else {
-                System.out.println("#############  SPAWNED PATROL CANNOT MOVE  ################");
+               System.out.println("#############  SPAWNED PATROL CANNOT MOVE  ################");
             }
         }
 

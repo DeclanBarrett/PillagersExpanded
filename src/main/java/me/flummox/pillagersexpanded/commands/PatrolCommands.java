@@ -18,7 +18,7 @@ public class PatrolCommands implements CommandExecutor {
 
             if (command.getName().equalsIgnoreCase("spawnpatrol")) {
                 sender.sendMessage("Only Administrators can spawn patrols");
-                System.out.println("Spawn Patrol Executed");
+               //"Spawn Patrol Executed");
             }
         } else {
             if (command.getName().equalsIgnoreCase("spawnpatrol")) {
@@ -28,9 +28,9 @@ public class PatrolCommands implements CommandExecutor {
                             Integer.parseInt(args[1]));
                     PatrolUpdateEvent patrolUpdate = new PatrolUpdateEvent(1);
                     getPluginManager().callEvent(patrolUpdate);
-                    System.out.println("Spawn Patrol Executed");
+                   //"Spawn Patrol Executed");
                 } else {
-                    System.out.println("/spawnpatrol x z");
+                   //"/spawnpatrol x z");
                 }
 
             }

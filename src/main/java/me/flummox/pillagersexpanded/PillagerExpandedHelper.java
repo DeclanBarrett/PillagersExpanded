@@ -34,7 +34,7 @@ public class PillagerExpandedHelper {
      * @return the location fo the pillager outpost (with block location)
      */
     public Location pillagerOutpost() {
-        System.out.println("Finding a pillager outpost");
+       //"Finding a pillager outpost");
         //Get the current amount of patrols
         Integer xLocation = (int) (Math.random() * 40000 - 20000); //$
         Integer yLocation = (int) (Math.random() * 40000 - 20000);
@@ -49,7 +49,7 @@ public class PillagerExpandedHelper {
                     5000, false); //$
         } while (patrolSpawnLocation == null);
 
-        System.out.println(patrolSpawnLocation);
+       //patrolSpawnLocation);
 
         return patrolSpawnLocation;
     }
@@ -59,7 +59,7 @@ public class PillagerExpandedHelper {
      * @return a list of locations where outposts are
      */
     public ArrayList<Location> pillagerOutposts() {
-        System.out.println("Attempting to find some outposts");
+       //"Attempting to find some outposts");
         ArrayList<Location> outposts = new ArrayList<>();
         World world = getServer().getWorld("world");
 
@@ -96,7 +96,7 @@ public class PillagerExpandedHelper {
      * @return the location fo the pillager outpost (in block form)
      */
     public Location villagerOutpost(Integer currentX, Integer currentZ) {
-        System.out.println("Finding a pillager outpost");
+       //"Finding a pillager outpost");
         //Get the current amount of patrolscurrentX
         Integer xLocation = (int) (Math.random() * 5000 - (2500 + currentX)); //$
         Integer yLocation = (int) (Math.random() * 5000 - (2500 + currentZ));
@@ -111,7 +111,7 @@ public class PillagerExpandedHelper {
                     1000, false); //$
         } while (patrolSpawnLocation == null);
 
-        System.out.println(patrolSpawnLocation);
+       //patrolSpawnLocation);
 
         return patrolSpawnLocation;
     }
