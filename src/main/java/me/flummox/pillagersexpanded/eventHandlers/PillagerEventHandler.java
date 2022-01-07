@@ -55,6 +55,7 @@ public class PillagerEventHandler implements Listener {
             for (String s : keyName) {
                 Patrol patrol = new Patrol(data, Integer.parseInt(s));
                 patrols.add(patrol);
+                System.out.println("[Pillagers Expanded] Adding a patrol to the cache of patrols");
                 patrol.reloadOnSave();
             }
         }
@@ -119,6 +120,13 @@ public class PillagerEventHandler implements Listener {
     public void onPatrolUpdate(PatrolUpdateEvent event) {
 
         new moveRunnable(event.getInterval(), Main.getPlugin(Main.class)).runTaskAsynchronously(Main.getPlugin(Main.class));
+        for (Outpost outpost: outposts) {
+            if (outpost.isActive() == false) {
+                outposts.remove(outpost);
+                outpost.remove();
+                break;
+            }
+        }
 
     }
 

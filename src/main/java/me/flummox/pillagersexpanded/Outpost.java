@@ -97,11 +97,7 @@ public class Outpost {
      */
     public Outpost(int outpostID, Location outpostLocation) {
         World world = outpostLocation.getWorld();
-        Material locationMaterial = world.getBlockAt(outpostLocation.getBlockX() ,
-                world.getHighestBlockYAt(outpostLocation.getBlockX() , outpostLocation.getBlockZ() ),
-                outpostLocation.getBlockZ() ).getType();
 
-        System.out.println("Outpost material" + locationMaterial );
         outpostLocation.setX(outpostLocation.getBlockX() );
         outpostLocation.setZ(outpostLocation.getBlockZ() );
         outpostLocation.setY(world.getHighestBlockYAt(outpostLocation.getBlockX(), outpostLocation.getBlockZ() ));
@@ -111,31 +107,7 @@ public class Outpost {
         this.outpostID = outpostID;
         this.isActive = true;
         //new buildOutpostRunnable(outpostLocation, Main.getPlugin(Main.class)).runTask(Main.getPlugin(Main.class));
-        int offset = 3;
-        for (int y = 0; y < building.length; y++) {
-            for (int x = 0; x < building[y].length; x++) {
-                for (int z = 0; z < building[y][x].length; z++) {
-                    //Spawn the specified block at the location
-                    System.out.println("y: " + y + " x: " + x + " z: " + z);
-                    if (building[y][x][z] != null) {
-                        world.getBlockAt(new Location(world,outpostLocation.getX() - offset + x,outpostLocation.getY() + y, outpostLocation.getZ() - offset + z)).setType(building[y][x][z]);
-                    }
-                }
-            }
-        }
-        generateWall();
-
-        if (isActive == true && locationMaterial != Material.SPAWNER) {
-            Block block = outpostLocation.getBlock();
-
-            block.setType(Material.SPAWNER);
-            CreatureSpawner creatureSpawner = (CreatureSpawner) block.getState();
-            creatureSpawner.setSpawnedType(EntityType.VINDICATOR);
-        } else {
-            System.out.println(" Material at Spawner " + locationMaterial);
-        }
-
-        System.out.println("CREATED " + outpostID + "| x: " + outpostLocation.getX() + " y: " + outpostLocation.getY() + " z: " + outpostLocation.getZ());
+        rebuildOutpost();
         save();
     }
 
@@ -152,13 +124,52 @@ public class Outpost {
         this.level = DataManager.getInstance().getConfig().getInt(outpostString + "level");
         this.isActive = DataManager.getInstance().getConfig().getBoolean(outpostString + "isActive");
         this.outpostLocation = new Location(getServer().getWorld("world"), currentX, currentY, currentZ);
+        rebuildOutpost();
         System.out.println("LOADED " + outpostID + "| x: " + outpostLocation.getX() + " y: " + outpostLocation.getY() + " z: " + outpostLocation.getZ());
+    }
+
+    private void rebuildOutpost() {
+        World world = outpostLocation.getWorld();
+
+        Material locationMaterial = world.getBlockAt(outpostLocation.getBlockX() ,
+                world.getHighestBlockYAt(outpostLocation.getBlockX() , outpostLocation.getBlockZ() ),
+                outpostLocation.getBlockZ() ).getType();
+
+        System.out.println("Outpost material" + locationMaterial );
+
+        if (isActive == true) {
+            int offset = 3;
+            for (int y = 0; y < building.length; y++) {
+                for (int x = 0; x < building[y].length; x++) {
+                    for (int z = 0; z < building[y][x].length; z++) {
+                        //Spawn the specified block at the location
+                        System.out.println("y: " + y + " x: " + x + " z: " + z);
+                        if (building[y][x][z] != null) {
+                            world.getBlockAt(new Location( world,outpostLocation.getX() - offset + x,outpostLocation.getY() + y, outpostLocation.getZ() - offset + z)).setType(building[y][x][z]);
+                        }
+                    }
+                }
+            }
+            generateWall();
+
+
+            Block block = outpostLocation.getBlock();
+
+            block.setType(Material.SPAWNER);
+            CreatureSpawner creatureSpawner = (CreatureSpawner) block.getState();
+            creatureSpawner.setSpawnedType(EntityType.VINDICATOR);
+        } else {
+            System.out.println(" Material at Spawner " + locationMaterial);
+        }
+
+        System.out.println("CREATED " + outpostID + "| x: " + outpostLocation.getX() + " y: " + outpostLocation.getY() + " z: " + outpostLocation.getZ());
+        save();
     }
 
 
 
     public void upgradeOutpost() {
-        System.out.println("Outpost Upgrading");
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!Outpost Upgrading!!!!!!!!!!!!!!!!!!!!!!!!");
         World world = outpostLocation.getWorld();
         level++;
         if (level == 2) {
@@ -251,13 +262,19 @@ public class Outpost {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean checkRaided() {
         Block block = outpostLocation.getBlock();
 
-        if (block.getType() == Material.SPAWNER) {
+        if (block.getType() != Material.SPAWNER) {
             isActive = false;
+        } else {
+            isActive = true;
         }
-
+        save();
         return isActive;
     }
 
@@ -300,5 +317,13 @@ public class Outpost {
                     outpostLocation.getBlockX(),
                     outpostLocation.getBlockZ());
         }
+    }
+
+    public void remove() {
+        System.out.println(outpostID + " DESTROYED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        String currentOutpostString = "outposts." + (this.getOutpostID());
+        DataManager data = DataManager.getInstance();
+        data.getConfig().set(currentOutpostString, null);
+        data.saveConfig();
     }
 }

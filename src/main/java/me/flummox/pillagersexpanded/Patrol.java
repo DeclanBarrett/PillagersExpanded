@@ -468,6 +468,7 @@ public class Patrol {
     }
 
     public void upgradePatrol() {
+        System.out.println("[Pillagers Expanded] Upgrade Patrol");
         //Stop adding traits (and move on to the next patrol) if the patrol already has maximum traits
         if (traits.size() >= level) {
             return;
