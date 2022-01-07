@@ -1,6 +1,5 @@
 package me.flummox.pillagersexpanded;
 
-import me.flummox.pillagersexpanded.eventHandlers.PatrolUpdateEvent;
 import me.flummox.pillagersexpanded.eventHandlers.PillagerEventHandler;
 import me.flummox.pillagersexpanded.eventHandlers.UpgradeEvent;
 import org.bukkit.Bukkit;
@@ -36,6 +35,10 @@ public class Patrol {
 
     private Outpost destinationOutpost;
 
+    public int getLevel() {
+        return level;
+    }
+
     private int level;
     private int patrolIndex;
 
@@ -43,6 +46,10 @@ public class Patrol {
     //private double currentSpeed;
     //private double currentProgress;
     private int speed;
+
+    public String getLeaderName() {
+        return leaderName;
+    }
 
     private String leaderName;
 
@@ -407,6 +414,8 @@ public class Patrol {
         currentZ = (int) currentP.y;
 
          */
+        System.out.print(patrolIndex + " Current x: " + currentX + ", z: " + currentZ);
+
         if (currentX < destinationX) {
             currentX += speed;
         } else if (currentX > destinationX) {
@@ -418,6 +427,10 @@ public class Patrol {
         } else if (currentZ > destinationZ) {
             currentZ -= speed;
         }
+
+
+        System.out.print(" Next x: " + currentX + ", z: " + currentZ);
+        System.out.println(" Dest x: " + destinationX + ", z: " + destinationZ);
 
         //If the distance to 0 is less than 3 chunks then get a new location
         if (currentX == destinationX && currentZ == destinationZ) {
@@ -595,6 +608,7 @@ public class Patrol {
             destinationOutpost = PillagerEventHandler.getInstance().getRandomOutpost();
             System.out.println("[Pillagers Expanded] Going to an outpost");
             destinationOutpostLocation = destinationOutpost.getOutpostLocation();
+            save();
         }
 
         //Create a destination point with integers
@@ -625,6 +639,11 @@ public class Patrol {
         String currentPatrolString = "currentPatrols." + (this.patrolIndex);
         data.getConfig().set(currentPatrolString, null);
         data.saveConfig();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (p.getLocation().distance(getCurrentLocation()) < 300) {
+                p.sendMessage("The Nearby Patrol Led By " + leaderName + " Was Destroyed!");
+            }
+        }
     }
 
     public void cleanOnDisable() {
@@ -700,5 +719,15 @@ public class Patrol {
         patrolLeader.setPatrolLeader(true);
         patrolLeader.getEquipment().setItemInMainHand(null);
         patrolLeader.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 60000, 1));
+    }
+
+    public Location getCurrentLocation() {
+        World world = getServer().getWorld("world");
+        return new Location(world, currentX * 16, 100, currentZ * 16);
+    }
+
+    public Location getDestinationLocation() {
+        World world = getServer().getWorld("world");
+        return new Location(world, destinationX * 16, 100, destinationZ * 16);
     }
 }

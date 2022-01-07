@@ -10,3 +10,11 @@ commands:
     description: Creates a patrol at the specified location
     usage: /<command>
     aliases: spawnpatrol
+  findpatrol:
+    description: Finds the nearest patrol so you can go hunt it down
+    usage: /<command>
+    aliases: findpatrol
+  findoutpost:
+    description: Finds the nearest outpost so you can go deactivate it
+    usage: /<command>
+    aliases: findoutpost

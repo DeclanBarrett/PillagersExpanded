@@ -3,12 +3,14 @@ package me.flummox.pillagersexpanded;
 import me.flummox.pillagersexpanded.eventHandlers.PillagerEventHandler;
 import me.flummox.pillagersexpanded.eventHandlers.buildOutpostRunnable;
 import me.flummox.pillagersexpanded.eventHandlers.moveRunnable;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
 import java.util.Optional;
 
@@ -18,6 +20,10 @@ public class Outpost {
 
     public Location getOutpostLocation() {
         return outpostLocation;
+    }
+
+    public int getLevel() {
+        return level;
     }
 
     private Location outpostLocation;
@@ -131,12 +137,6 @@ public class Outpost {
     private void rebuildOutpost() {
         World world = outpostLocation.getWorld();
 
-        Material locationMaterial = world.getBlockAt(outpostLocation.getBlockX() ,
-                world.getHighestBlockYAt(outpostLocation.getBlockX() , outpostLocation.getBlockZ() ),
-                outpostLocation.getBlockZ() ).getType();
-
-       //"Outpost material" + locationMaterial );
-
         if (isActive == true) {
             int offset = 3;
             for (int y = 0; y < building.length; y++) {
@@ -158,11 +158,8 @@ public class Outpost {
             block.setType(Material.SPAWNER);
             CreatureSpawner creatureSpawner = (CreatureSpawner) block.getState();
             creatureSpawner.setSpawnedType(EntityType.VINDICATOR);
-        } else {
-           //" Material at Spawner " + locationMaterial);
         }
 
-       //"CREATED " + outpostID + "| x: " + outpostLocation.getX() + " y: " + outpostLocation.getY() + " z: " + outpostLocation.getZ());
         save();
     }
 
@@ -325,5 +322,10 @@ public class Outpost {
         DataManager data = DataManager.getInstance();
         data.getConfig().set(currentOutpostString, null);
         data.saveConfig();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (p.getLocation().distance(outpostLocation) < 300) {
+                p.sendMessage("The Nearby Outpost Was Destroyed!");
+            }
+        }
     }
 }

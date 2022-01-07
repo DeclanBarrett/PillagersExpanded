@@ -30,7 +30,8 @@ public final class Main extends JavaPlugin {
 
         PatrolCommands patrolCommands = new PatrolCommands();
         getCommand("spawnpatrol").setExecutor(patrolCommands);
-
+        getCommand("findpatrol").setExecutor(patrolCommands);
+        getCommand("findoutpost").setExecutor(patrolCommands);
     }
 
     @Override
