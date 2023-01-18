@@ -1,0 +1,29 @@
+name: PillagersExpanded
+version: '${project.version}'
+main: me.flummox.pillagersexpanded.Main
+api-version: 1.19
+authors: [ Flummox ]
+description: Upgrades the pillager patrol system
+website: https://www.youtube.com/channel/UCZcsga5c4XiymsxsNZKsE6w
+commands:
+  spawnpatrol:
+    description: Allows server to create a patrol at the specified location
+    usage: /<command>
+    aliases: spawnpatrol
+  listpatrols:
+    description: Allows server to lists all the current patrols
+    usage: /<command>
+    aliases: listpatrols
+  listbases:
+    description: Allows server to lists all the current bases
+    usage: /<command>
+    aliases: listbases
+  findpatrol:
+    description: Finds the nearest patrol so you can go hunt it down
+    usage: /<command>
+    aliases: findpatrol
+  findbase:
+    description: Finds the nearest outpost so you can go deactivate it
+    usage: /<command>
+    aliases: findbase
+depend: [WorldEdit]
