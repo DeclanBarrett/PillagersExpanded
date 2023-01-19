@@ -11,9 +11,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import me.flummox.pillagersexpanded.DataManager;
 import me.flummox.pillagersexpanded.enums.BaseType;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -156,14 +153,13 @@ public class PillagerCastle extends Base {
     public void showBaseDestroyed() {
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.getLocation().distance(location) < 300) {
-                final Component mainTitle = Component.text("CASTLE DESTROYED", NamedTextColor.WHITE);
-                final Component subtitle = Component.text("Patrols will no longer spawn here", NamedTextColor.GRAY);
-
-                // Creates a simple title with the default values for fade-in, stay on screen and fade-out durations
-                final Title title = Title.title(mainTitle, subtitle);
-
-                // Send the title to your audience
-                p.showTitle(title);
+                //final Component mainTitle = Component.text("CASTLE DESTROYED", NamedTextColor.WHITE);
+                //final Component subtitle = Component.text("Patrols will no longer spawn here", NamedTextColor.GRAY);
+                //// Creates a simple title with the default values for fade-in, stay on screen and fade-out durations
+                //final Title title = Title.title(mainTitle, subtitle);
+                //// Send the title to your audience
+                //p.showTitle(title);
+                p.sendTitle("CASTLE DESTROYED", "Patrols will no longer spawn here");
                 //Title("OUTPOST DESTROYED", "PillagerOutpost will no longer produce patrols");
                 //p.resetTitle();
 

@@ -6,8 +6,7 @@ import me.flummox.pillagersexpanded.Point;
 import me.flummox.pillagersexpanded.bases.Base;
 import me.flummox.pillagersexpanded.eventHandlers.PillagerEventHandler;
 import me.flummox.pillagersexpanded.eventHandlers.UpgradeEvent;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.title.Title;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -451,7 +450,7 @@ public class PillagerPatrol {
 
             leaderName.append("captain");
 
-            patrolLeader.customName(Component.text(leaderName.toString()));
+            patrolLeader.setCustomName(leaderName.toString());
 
             //Set the leader settings
             patrolLeader.setPatrolLeader(true);
@@ -807,7 +806,7 @@ public class PillagerPatrol {
         data.savePatrols();
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.getLocation().distance(getCurrentLocation()) < 300) {
-                p.showTitle(Title.title(Component.text("PATROL DESTROYED"), Component.text("Pillager patrol was led by " + leaderName)));
+                p.sendTitle("PATROL DESTROYED", "Pillager patrol was led by " + leaderName);
             }
         }
     }
