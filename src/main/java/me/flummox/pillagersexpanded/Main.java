@@ -94,7 +94,7 @@ public final class Main extends JavaPlugin {
         this.data.setupData(this);
         if (!this.data.getConfig().contains("bases.checkTime")) {
             data.getConfig().set("allow.patrols", true);
-            data.getConfig().set("allow.castles", true);
+            data.getConfig().set("allow.castles", false);
             data.getConfig().set("allow.outposts", true);
             data.getConfig().set("allow.commands", true);
 

@@ -1,9 +1,5 @@
 package me.flummox.pillagersexpanded;
 
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
-import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -23,7 +19,6 @@ public class DataManager {
     private File patrolFile = null;
     private FileConfiguration baseConfig = null;
     private File baseFile = null;
-    private ArrayList<Clipboard> castleStructures = new ArrayList<>();
 
 
     public void setupData(Main plugin) {
@@ -46,36 +41,6 @@ public class DataManager {
      */
     public static DataManager getInstance() {
         return DataManager.SingletonHolder.INSTANCE;
-    }
-
-    /**
-     * Gets the castle schematics from the "schematics" folder in the data folder
-     * with the castle schematics being named "castle" integer ".schem" from 0 through to 9
-     * @return array of clipboards containing castle
-     */
-    public ArrayList<Clipboard> gatherCastleSchematics() throws NullPointerException {
-        if (castleStructures.size() == 0) {
-            ArrayList<File> structureFiles = new ArrayList<>();
-            castleStructures = new ArrayList<>();
-            File folder = new File(this.plugin.getDataFolder(), "schematics");
-
-            for (int i = 0; i < 9; i++) {
-                structureFiles.add(new File(folder, "castle" + i + ".schem"));
-            }
-
-
-                for (File structureFile : structureFiles) {
-                    ClipboardFormat format = ClipboardFormats.findByFile(structureFile);
-                    try (ClipboardReader reader = Objects.requireNonNull(format).getReader(new FileInputStream(structureFile))) {
-                        castleStructures.add(reader.read());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-
-        }
-        return castleStructures;
     }
 
     /**

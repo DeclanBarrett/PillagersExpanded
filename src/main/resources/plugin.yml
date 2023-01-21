@@ -26,4 +26,3 @@ commands:
     description: Finds the nearest outpost so you can go deactivate it
     usage: /<command>
     aliases: findbase
-depend: [WorldEdit]

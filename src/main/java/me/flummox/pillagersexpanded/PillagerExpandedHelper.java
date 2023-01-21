@@ -1,6 +1,5 @@
 package me.flummox.pillagersexpanded;
 
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import me.flummox.pillagersexpanded.enums.BaseLocationPair;
 import me.flummox.pillagersexpanded.enums.BaseType;
 import org.bukkit.*;
@@ -123,7 +122,7 @@ public class PillagerExpandedHelper {
                 }
 
                 //Adds a base if an outpost isn't present
-                if (DataManager.getInstance().getConfig().getBoolean("allow.castles") && !isOutpostPresent) {
+                if (false && !isOutpostPresent) {
 
                     int yLocation = world.getHighestBlockYAt(xCurrent, zCurrent);
 
@@ -168,13 +167,6 @@ public class PillagerExpandedHelper {
        //patrolSpawnLocation);
 
         return patrolDestinationLocation;
-    }
-
-    public WorldEditPlugin getWorldEdit() {
-        Plugin p = getServer().getPluginManager().getPlugin("WorldEdit");
-
-        if (p instanceof WorldEditPlugin) return (WorldEditPlugin) p;
-        else return null;
     }
 
 }
