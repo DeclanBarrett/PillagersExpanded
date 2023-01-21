@@ -2,7 +2,6 @@ package me.flummox.pillagersexpanded.eventHandlers;
 
 import me.flummox.pillagersexpanded.*;
 import me.flummox.pillagersexpanded.bases.Base;
-import me.flummox.pillagersexpanded.bases.PillagerCastle;
 import me.flummox.pillagersexpanded.bases.PillagerOutpost;
 import me.flummox.pillagersexpanded.enums.BaseLocationPair;
 import me.flummox.pillagersexpanded.enums.BaseType;
@@ -126,9 +125,6 @@ public class PillagerEventHandler implements Listener {
                         case OUTPOST:
                             pillagerBase = new PillagerOutpost(baseID);
                             break;
-                        case CASTLE:
-                            pillagerBase = new PillagerCastle(baseID);
-                            break;
                         default:
                             pillagerBase = new PillagerOutpost(baseID);
 
@@ -146,9 +142,6 @@ public class PillagerEventHandler implements Listener {
                     switch(outpostLocations.get(baseID).getBaseType()) {
                         case OUTPOST:
                             pillagerBase = new PillagerOutpost(baseID, outpostLocations.get(baseID).getLocation());
-                            break;
-                        case CASTLE:
-                            pillagerBase = new PillagerCastle(baseID, outpostLocations.get(baseID).getLocation());
                             break;
                         default:
                             pillagerBase = new PillagerOutpost(baseID, outpostLocations.get(baseID).getLocation());

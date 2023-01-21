@@ -101,11 +101,5 @@
             <version>1.19-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.sk89q.worldedit</groupId>
-            <artifactId>worldedit-bukkit</artifactId>
-            <version>7.2.11-beta-01</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 </project>
