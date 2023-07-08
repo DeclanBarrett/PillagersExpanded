@@ -22,3 +22,8 @@ Adds castles:
 - Destroying castle stops patrols spawning at the castle
 - Patrols spawn at castles
 - Castles upgrade when pillager patrols finish their patrol at the outpost
+
+Instructions:
+Place the plugin jar file into the plugins folder of the server.
+Create a Pillagers Expanded folder in the plugins folder.
+Unzip the schematics folder, and place the schematics folder into the PillagersExpanded folder.
