@@ -20,19 +20,14 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-
 import java.util.logging.Level;
-
-import static com.sk89q.worldedit.bukkit.BukkitAdapter.adapt;
 import static org.bukkit.Bukkit.getLogger;
 
 public class PillagerCastle extends Base {
 
     private Clipboard clipboardCastle;
-    private Location goldBlockLocation;
+    private final Location goldBlockLocation;
     //private File file = this.plugin.getDataFolder()/* figure out where to save the clipboard */;
 
 
@@ -59,7 +54,7 @@ public class PillagerCastle extends Base {
 
     /**
      * Load the outpost from the config fle
-     * @param baseID
+     * @param baseID ID of Base
      */
     public PillagerCastle(int baseID) {
         createDigitalBase(baseID);
@@ -73,7 +68,7 @@ public class PillagerCastle extends Base {
     public void buildBase() {
         World world = location.getWorld();
 
-        if (isActive == true) {
+        if (isActive) {
             com.sk89q.worldedit.world.World editedWorld = BukkitAdapter.adapt(world);
 
             try (EditSession editSession = WorldEdit.getInstance().newEditSession(editedWorld)) {
@@ -113,7 +108,7 @@ public class PillagerCastle extends Base {
             for (int y = -(cubeRadius); y <= (cubeRadius); y++) {
                 for (int z = -(cubeRadius); z<= (cubeRadius); z++) {
                     if (!(x <= 1 && x >= -1 && y <= 1 && y >= -1 && z <= 1 && z >= -1)) {
-                        world.getBlockAt(new Location(world,location.getX() + x,location.getY() + y, location.getZ() + z)).setType(Material.OBSIDIAN);
+                        world.getBlockAt(new Location(world,goldBlockLocation.getX() + x,goldBlockLocation.getY() + y, goldBlockLocation.getZ() + z)).setType(Material.OBSIDIAN);
                     }
                 }
             }
@@ -133,7 +128,7 @@ public class PillagerCastle extends Base {
 
     /**
      * Check if the golden block is still there to determine if raided
-     * @param breakEvent
+     * @param breakEvent event of block breaking
      */
     public boolean checkRaided(BlockBreakEvent breakEvent) {
         if (!breakEvent.getBlock().getLocation().equals(goldBlockLocation)) {

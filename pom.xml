@@ -107,5 +107,10 @@
             <version>7.2.11-beta-01</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.sk89q.worldedit</groupId>
+            <artifactId>worldedit-core</artifactId>
+            <version>7.2.11-beta-01</version>
+        </dependency>
     </dependencies>
 </project>
